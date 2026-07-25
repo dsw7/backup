@@ -52,6 +52,19 @@ fn check_exit_status(exit_status: &ExitStatus) -> Result<String, BackupError> {
     }
 }
 
+fn run_rsync(src: &String, dst: &String) -> Result<String, BackupError> {
+    let status = Command::new("rsync")
+        .arg("-av")
+        .arg("--delete")
+        .arg("--log-file=/tmp/backup.log")
+        .arg(src)
+        .arg(dst)
+        .status()
+        .expect("Command failed to start. There is no way to proceed");
+
+    check_exit_status(&status)
+}
+
 fn run_rsync_dry_run(src: &String, dst: &String) -> Result<String, BackupError> {
     let status = Command::new("rsync")
         .arg("-av")
@@ -74,5 +87,10 @@ pub fn run_backup(configs: &Config) -> Result<String, BackupError> {
 
     let src = append_slash_to_source(&configs.source);
     let dst = select_destination(backup_options.sync_to_hot, &configs);
-    run_rsync_dry_run(&src, &dst)
+
+    if backup_options.is_dry_run {
+        run_rsync_dry_run(&src, &dst)
+    } else {
+        run_rsync(&src, &dst)
+    }
 }
