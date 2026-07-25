@@ -7,24 +7,29 @@ use std::fs;
 use std::path::PathBuf;
 
 #[derive(Deserialize, Debug)]
-pub struct HotStorage {
-    pub user: String,
-    pub host: String,
-    pub destination: String,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct ColdStorage {
-    pub user: String,
-    pub host: String,
-    pub destination: String,
-}
-
-#[derive(Deserialize, Debug)]
 pub struct Config {
     pub source: String,
-    pub storage_hot: HotStorage,
-    pub storage_cold: ColdStorage,
+    pub storage: Storage,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Storage {
+    pub hot: Hot,
+    pub cold: Cold,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Hot {
+    pub user: String,
+    pub host: String,
+    pub destination: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Cold {
+    pub user: String,
+    pub host: String,
+    pub destination: String,
 }
 
 fn read_config_file_to_toml_string(config_file_path: &PathBuf) -> Result<String, BackupError> {
