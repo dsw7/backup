@@ -16,8 +16,8 @@ fn read_option_from_stdin() -> Option<i32> {
         }
     };
 
-    if option < 1 || option > 4 {
-        println!("Enter an option between 1 and 4");
+    if option < 1 || option > 5 {
+        println!("Enter an option between 1 and 5");
         return None;
     }
 
@@ -41,12 +41,19 @@ fn run_loop() -> i32 {
     }
 }
 
+pub struct UserSelection {
+    sync_to_hot: bool,
+    is_dry_run: bool,
+    exit_program: bool,
+}
+
 pub fn select_backup_type() -> i32 {
     println!("Select backup type:");
     println!("[1] -> Synchronize directories to HOT storage");
     println!("[2] -> Synchronize directories to HOT storage [DRY RUN]");
     println!("[3] -> Synchronize directories to COLD storage");
     println!("[4] -> Synchronize directories to COLD storage [DRY RUN]");
+    println!("[5] -> Exit program");
 
     run_loop()
 }
