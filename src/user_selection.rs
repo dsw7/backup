@@ -2,28 +2,22 @@ use std::io::{self, Write};
 use std::str::FromStr;
 
 fn read_option_from_stdin() -> Option<i32> {
-    print!("> ");
-    io::stdout()
-        .flush()
-        .expect("Unrecoverable error: Failed to flush stdout");
-
     let mut input = String::new();
 
-    if let Err(e) = io::stdin().read_line(&mut input) {
-        eprintln!("{e}");
-        return None;
-    }
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Unrecoverable error: Failed to read from stdin");
 
     let option = match i32::from_str(input.trim()) {
         Ok(val) => val,
-        Err(e) => {
-            eprintln!("{e}");
+        Err(_) => {
+            println!("Cannot convert input to integer value");
             return None;
         }
     };
 
-    if !matches!(option, 1 | 2 | 3 | 4) {
-        eprintln!("Enter an option between 1 and 4");
+    if option < 1 || option > 4 {
+        println!("Enter an option between 1 and 4");
         return None;
     }
 
@@ -32,9 +26,17 @@ fn read_option_from_stdin() -> Option<i32> {
 
 fn run_loop() -> i32 {
     loop {
+        print!("> ");
+        io::stdout()
+            .flush()
+            .expect("Unrecoverable error: Failed to flush stdout");
+
         match read_option_from_stdin() {
             Some(option) => return option,
-            None => continue,
+            None => {
+                println!("Try again");
+                continue;
+            }
         }
     }
 }
