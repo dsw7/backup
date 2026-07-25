@@ -4,26 +4,24 @@ mod program_files;
 mod run_backup;
 
 use configs::load_configs;
+use errors::BackupError;
 use run_backup::run_backup;
 
 use std::process::ExitCode;
 
-fn main() -> ExitCode {
-    let configs = match load_configs() {
-        Ok(configs) => configs,
-        Err(error) => {
-            eprintln!("Failed to load program configurations: {error}");
-            return ExitCode::FAILURE;
-        }
-    };
+fn run_sync() -> Result<String, BackupError> {
+    let configs = load_configs()?;
+    run_backup(&configs)
+}
 
-    match run_backup(&configs) {
+fn main() -> ExitCode {
+    match run_sync() {
         Ok(results) => {
             println!("{results}");
             ExitCode::SUCCESS
         }
         Err(error) => {
-            eprintln!("Data synchronization failed: {error}");
+            eprintln!("{error}");
             ExitCode::FAILURE
         }
     }
