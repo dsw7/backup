@@ -25,8 +25,11 @@ fn format_destination(user: &String, host: &String, destination: &String) -> Str
 
 fn run_rsync_hot_storage_dry_run(configs: &Config) {
     let src = append_slash_to_source(&configs.source);
-    let store = &configs.storage.hot;
-    let dst = format_destination(&store.user, &store.host, &store.destination);
+    let dst = format_destination(
+        &configs.storage.hot.user,
+        &configs.storage.hot.host,
+        &configs.storage.hot.destination,
+    );
 
     let status = Command::new("rsync")
         .arg("-av")
