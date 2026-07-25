@@ -49,7 +49,7 @@ fn get_config_file_path(home_dir: &PathBuf) -> Result<PathBuf, io::Error> {
     Ok(config_file_path)
 }
 
-fn read_config_file_to_string(config_file_path: &PathBuf) -> Result<String, io::Error> {
+fn read_config_file_to_toml_string(config_file_path: &PathBuf) -> Result<String, io::Error> {
     match fs::read_to_string(config_file_path) {
         Ok(contents) => Ok(contents),
         Err(e) => {
@@ -61,11 +61,22 @@ fn read_config_file_to_string(config_file_path: &PathBuf) -> Result<String, io::
     }
 }
 
+fn parse_toml_string(toml_str: &String) -> Result<Config, io::Error> {
+    match toml::from_str::<Config>(toml_str) {
+        Ok(config) => Ok(config),
+        Err(e) => {
+            return Err(io::Error::new(
+                io::ErrorKind::Other,
+                format!("Failed to parse TOML: {e}"),
+            ));
+        }
+    }
+}
+
 pub fn load_configs() -> Result<Config, io::Error> {
     let home_dir = get_home_dir()?;
     let config_file = get_config_file_path(&home_dir)?;
-    let contents = read_config_file_to_string(&config_file)?;
-
-    let config: Config = toml::from_str(&contents).expect("Failed to parse TOML content");
-    Ok(config)
+    let toml_str = read_config_file_to_toml_string(&config_file)?;
+    let configs = parse_toml_string(&toml_str)?;
+    Ok(configs)
 }
