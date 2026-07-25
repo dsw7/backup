@@ -68,6 +68,10 @@ fn run_rsync_dry_run(src: &String, dst: &String) -> Result<String, BackupError> 
 pub fn run_backup(configs: &Config) -> Result<String, BackupError> {
     let backup_options = select_backup_type();
 
+    if backup_options.exit_program {
+        return Ok(String::from("Program manually aborted"));
+    }
+
     let src = append_slash_to_source(&configs.source);
     let dst = select_destination(backup_options.sync_to_hot, &configs);
     run_rsync_dry_run(&src, &dst)
