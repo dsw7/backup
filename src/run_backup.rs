@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::process::{Command, ExitStatus};
 
 use crate::configs::Config;
 
@@ -39,6 +39,10 @@ fn select_destination(sync_to_hot: bool, configs: &Config) -> String {
     }
 }
 
+fn check_exit_status(exit_status: &ExitStatus) {
+    println!("Process exited with status: {}", exit_status);
+}
+
 fn run_rsync_dry_run(src: &String, dst: &String) {
     let status = Command::new("rsync")
         .arg("-av")
@@ -49,7 +53,7 @@ fn run_rsync_dry_run(src: &String, dst: &String) {
         .status()
         .expect("Command failed to start. There is no way to proceed");
 
-    println!("Process exited with status: {}", status);
+    check_exit_status(&status);
 }
 
 pub fn run_backup(configs: &Config) {
