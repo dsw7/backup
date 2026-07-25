@@ -17,7 +17,14 @@ fn main() -> ExitCode {
         }
     };
 
-    run_backup(&configs);
-
-    ExitCode::SUCCESS
+    match run_backup(&configs) {
+        Ok(results) => {
+            println!("{results}");
+            ExitCode::SUCCESS
+        }
+        Err(error) => {
+            eprintln!("Data synchronization failed: {error}");
+            ExitCode::FAILURE
+        }
+    }
 }
