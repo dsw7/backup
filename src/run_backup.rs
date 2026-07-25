@@ -2,6 +2,7 @@ use std::process::{Command, ExitStatus};
 
 use crate::configs::Config;
 use crate::errors::BackupError;
+use crate::get_backup_options::select_backup_type;
 
 fn append_slash_to_source(source: &String) -> String {
     if source.ends_with('/') {
@@ -65,9 +66,9 @@ fn run_rsync_dry_run(src: &String, dst: &String) -> Result<String, BackupError> 
 }
 
 pub fn run_backup(configs: &Config) -> Result<String, BackupError> {
-    let sync_to_hot = true;
+    let backup_options = select_backup_type();
 
     let src = append_slash_to_source(&configs.source);
-    let dst = select_destination(sync_to_hot, &configs);
+    let dst = select_destination(backup_options.sync_to_hot, &configs);
     run_rsync_dry_run(&src, &dst)
 }

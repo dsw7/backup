@@ -45,13 +45,13 @@ fn run_option_loop() -> i32 {
     }
 }
 
-pub struct UserSelection {
-    sync_to_hot: bool,
-    is_dry_run: bool,
-    exit_program: bool,
+pub struct BackupOptions {
+    pub sync_to_hot: bool,
+    pub is_dry_run: bool,
+    pub exit_program: bool,
 }
 
-fn get_user_selection(option: i32) -> UserSelection {
+fn get_backup_options(option: i32) -> BackupOptions {
     let mut sync_to_hot = false;
     let mut is_dry_run = false;
     let mut exit_program = false;
@@ -67,14 +67,14 @@ fn get_user_selection(option: i32) -> UserSelection {
         _ => unreachable!("Value is checked upstream"),
     }
 
-    UserSelection {
+    BackupOptions {
         sync_to_hot: sync_to_hot,
         is_dry_run: is_dry_run,
         exit_program: exit_program,
     }
 }
 
-pub fn select_backup_type() -> UserSelection {
+pub fn select_backup_type() -> BackupOptions {
     println!("Select backup type:");
     println!("[1] -> Synchronize directories to HOT storage");
     println!("[2] -> Synchronize directories to HOT storage [DRY RUN]");
@@ -83,5 +83,5 @@ pub fn select_backup_type() -> UserSelection {
     println!("[5] -> Exit program");
 
     let option = run_option_loop();
-    get_user_selection(option)
+    get_backup_options(option)
 }
