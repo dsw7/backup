@@ -1,6 +1,13 @@
 use std::io::{self, Write};
 use std::str::FromStr;
 
+fn print_prompt() {
+    print!("> ");
+    io::stdout()
+        .flush()
+        .expect("Unrecoverable error: Failed to flush stdout");
+}
+
 fn read_option_from_stdin() -> Option<i32> {
     let mut input = String::new();
 
@@ -26,10 +33,7 @@ fn read_option_from_stdin() -> Option<i32> {
 
 fn run_option_loop() -> i32 {
     loop {
-        print!("> ");
-        io::stdout()
-            .flush()
-            .expect("Unrecoverable error: Failed to flush stdout");
+        print_prompt();
 
         match read_option_from_stdin() {
             Some(option) => return option,
