@@ -42,11 +42,10 @@ fn get_home_dir() -> Result<PathBuf, io::Error> {
     }
 }
 
-fn get_config_file_path(home_dir: &PathBuf) -> Result<PathBuf, io::Error> {
+fn get_config_file_path(home_dir: &PathBuf) -> PathBuf {
     let mut config_file_path = PathBuf::from(home_dir);
     config_file_path.push(".backup/config.toml");
-
-    Ok(config_file_path)
+    config_file_path
 }
 
 fn read_config_file_to_toml_string(config_file_path: &PathBuf) -> Result<String, io::Error> {
@@ -75,7 +74,7 @@ fn parse_toml_string(toml_str: &String) -> Result<Config, io::Error> {
 
 pub fn load_configs() -> Result<Config, io::Error> {
     let home_dir = get_home_dir()?;
-    let config_file = get_config_file_path(&home_dir)?;
+    let config_file = get_config_file_path(&home_dir);
     let toml_str = read_config_file_to_toml_string(&config_file)?;
     let configs = parse_toml_string(&toml_str)?;
     Ok(configs)
