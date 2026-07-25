@@ -10,9 +10,24 @@ fn append_slash_to_source(source: &String) -> String {
     }
 }
 
+fn remove_slash_from_destination(destination: &String) -> String {
+    if destination.ends_with('/') {
+        String::from(&destination[..destination.len() - 1])
+    } else {
+        String::from(destination)
+    }
+}
+
+fn format_destination(user: &String, host: &String, destination: &String) -> String {
+    let dst = remove_slash_from_destination(destination);
+    format!("{user}@{host}:{dst}")
+}
+
 fn run_rsync_hot_storage_dry_run(configs: &Config) {
     let src = append_slash_to_source(&configs.source);
-    let dst = String::from("dsw@10.0.0.115:/tmp/bar");
+    let store = &configs.storage.hot;
+    let dst = format_destination(&store.user, &store.host, &store.destination);
+
     let status = Command::new("rsync")
         .arg("-av")
         .arg("--dry-run")
