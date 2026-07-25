@@ -7,11 +7,6 @@ use std::fs;
 use std::path::PathBuf;
 
 #[derive(Deserialize, Debug)]
-pub struct General {
-    pub source: String,
-}
-
-#[derive(Deserialize, Debug)]
 pub struct HotStorage {
     pub user: String,
     pub host: String,
@@ -27,7 +22,7 @@ pub struct ColdStorage {
 
 #[derive(Deserialize, Debug)]
 pub struct Config {
-    pub general: General,
+    pub source: String,
     pub storage_hot: HotStorage,
     pub storage_cold: ColdStorage,
 }
