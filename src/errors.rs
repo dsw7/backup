@@ -1,16 +1,16 @@
 use std::fmt;
 
 #[derive(Debug, Clone)]
-pub struct ConfigError(pub String);
+pub struct BackupError(pub String);
 
-impl fmt::Display for ConfigError {
+impl fmt::Display for BackupError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
-impl From<String> for ConfigError {
+impl From<String> for BackupError {
     fn from(msg: String) -> Self {
-        ConfigError(msg)
+        BackupError(msg)
     }
 }
