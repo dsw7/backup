@@ -55,19 +55,19 @@ fn select_log_file(sync_to_hot: bool) -> Result<PathBuf, BackupError> {
 }
 
 pub fn run_backup(configs: &Config) -> Result<String, BackupError> {
-    let backup_options = select_backup_type();
+    let (sync_to_hot, is_dry_run, exit_program) = select_backup_type();
 
-    if backup_options.exit_program {
+    if exit_program {
         return Ok(String::from("Program manually aborted"));
     }
 
     let src = append_slash_to_source(&configs.source);
-    let dst = select_destination(backup_options.sync_to_hot, &configs);
+    let dst = select_destination(sync_to_hot, &configs);
 
-    if backup_options.is_dry_run {
+    if is_dry_run {
         run_rsync_dry_run(&src, &dst)
     } else {
-        let log_file = select_log_file(backup_options.sync_to_hot)?;
+        let log_file = select_log_file(sync_to_hot)?;
         run_rsync(&src, &dst, &log_file)
     }
 }

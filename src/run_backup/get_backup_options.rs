@@ -45,36 +45,7 @@ fn run_option_loop() -> i32 {
     }
 }
 
-pub struct BackupOptions {
-    pub sync_to_hot: bool,
-    pub is_dry_run: bool,
-    pub exit_program: bool,
-}
-
-fn get_backup_options(option: i32) -> BackupOptions {
-    let mut sync_to_hot = false;
-    let mut is_dry_run = false;
-    let mut exit_program = false;
-
-    match option {
-        1 => sync_to_hot = true,
-        2 => {
-            sync_to_hot = true;
-            is_dry_run = true;
-        }
-        4 => is_dry_run = true,
-        5 => exit_program = true,
-        _ => unreachable!("Value is checked upstream"),
-    }
-
-    BackupOptions {
-        sync_to_hot: sync_to_hot,
-        is_dry_run: is_dry_run,
-        exit_program: exit_program,
-    }
-}
-
-pub fn select_backup_type() -> BackupOptions {
+pub fn select_backup_type() -> (bool, bool, bool) {
     println!("Select backup type:");
     println!("[1] -> Synchronize directories to HOT storage");
     println!("[2] -> Synchronize directories to HOT storage [DRY RUN]");
@@ -83,5 +54,9 @@ pub fn select_backup_type() -> BackupOptions {
     println!("[5] -> Exit program");
 
     let option = run_option_loop();
-    get_backup_options(option)
+    let sync_to_hot = matches!(option, 1 | 2);
+    let is_dry_run = matches!(option, 2 | 4);
+    let exit_program = option == 5;
+
+    (sync_to_hot, is_dry_run, exit_program)
 }
