@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 use crate::errors::BackupError;
-use crate::program_files::get_config_file_path;
+use crate::program_files::get_program_data_dir;
 
 use std::fs;
 use std::path::PathBuf;
@@ -30,6 +30,11 @@ pub struct Cold {
     pub user: String,
     pub host: String,
     pub destination: String,
+}
+
+fn get_config_file_path() -> Result<PathBuf, BackupError> {
+    let program_dir = get_program_data_dir()?;
+    Ok(PathBuf::from(program_dir).join("config.toml"))
 }
 
 fn read_config_file_to_toml_string(config_file: &PathBuf) -> Result<String, BackupError> {

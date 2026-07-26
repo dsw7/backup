@@ -23,8 +23,3 @@ pub fn get_program_data_dir() -> Result<PathBuf, BackupError> {
         )))
     }
 }
-
-pub fn get_config_file_path() -> Result<PathBuf, BackupError> {
-    let program_dir = get_program_data_dir()?;
-    Ok(PathBuf::from(program_dir).join("config.toml"))
-}
