@@ -32,12 +32,12 @@ pub struct Cold {
     pub destination: String,
 }
 
-fn read_config_file_to_toml_string(config_path: &PathBuf) -> Result<String, BackupError> {
-    match fs::read_to_string(config_path) {
+fn read_config_file_to_toml_string(config_file: &PathBuf) -> Result<String, BackupError> {
+    match fs::read_to_string(config_file) {
         Ok(contents) => Ok(contents),
         Err(e) => Err(BackupError(format!(
             "Failed to read '{}': {e}",
-            config_path.display()
+            config_file.display()
         ))),
     }
 }
