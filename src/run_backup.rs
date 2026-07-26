@@ -3,6 +3,7 @@ use std::process::{Command, ExitStatus};
 use crate::configs::Config;
 use crate::errors::BackupError;
 use crate::get_backup_options::select_backup_type;
+use crate::program_files::get_log_file_path;
 
 fn append_slash_to_source(source: &String) -> String {
     if source.ends_with('/') {
@@ -53,10 +54,11 @@ fn check_exit_status(exit_status: &ExitStatus) -> Result<String, BackupError> {
 }
 
 fn run_rsync(src: &String, dst: &String) -> Result<String, BackupError> {
+    let log_file_path = get_log_file_path()?;
     let status = Command::new("rsync")
         .arg("-av")
         .arg("--delete")
-        .arg("--log-file=/tmp/backup.log")
+        .arg(format!("--log-file={}", log_file_path.display()))
         .arg(src)
         .arg(dst)
         .status()
