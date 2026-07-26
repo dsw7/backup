@@ -1,3 +1,4 @@
-mod get_backup_options;
-pub mod rsync;
+mod select_backup_type;
 mod subprocesses;
+
+pub mod rsync;

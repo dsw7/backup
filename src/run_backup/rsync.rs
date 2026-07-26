@@ -2,7 +2,7 @@ use crate::configs::Config;
 use crate::errors::BackupError;
 use crate::program_files::get_program_data_dir;
 
-use super::get_backup_options::select_backup_type;
+use super::select_backup_type::select_backup_type;
 use super::subprocesses::{run_rsync, run_rsync_dry_run};
 
 use std::path::PathBuf;
