@@ -10,7 +10,7 @@ fn get_home_dir() -> Result<PathBuf, BackupError> {
     }
 }
 
-pub fn get_program_data_dir() -> Result<PathBuf, BackupError> {
+pub fn get_data_dir() -> Result<PathBuf, BackupError> {
     let home_dir = get_home_dir()?;
     let program_dir = PathBuf::from(home_dir).join(".backup");
 

@@ -1,6 +1,6 @@
 use crate::configs::Config;
+use crate::data_directory;
 use crate::errors::BackupError;
-use crate::program_files::get_program_data_dir;
 
 use super::subprocesses;
 
@@ -81,7 +81,7 @@ fn select_destination(sync_to_hot: bool, configs: &Config) -> String {
 }
 
 fn select_log_file(sync_to_hot: bool) -> Result<PathBuf, BackupError> {
-    let program_dir = get_program_data_dir()?;
+    let program_dir = data_directory::get_data_dir()?;
 
     if sync_to_hot {
         Ok(PathBuf::from(program_dir).join("backup_hot.log"))
