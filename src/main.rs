@@ -3,7 +3,7 @@ mod data_directory;
 mod errors;
 mod run_backup;
 
-use clap::Parser;
+use clap::{Parser, Subcommand};
 
 use configs::load_configs;
 use errors::BackupError;
@@ -13,17 +13,33 @@ use std::process::ExitCode;
 
 #[derive(Parser, Debug)]
 #[command(name = "backup", version, about = "DSW backup and recovery system")]
-struct Cli {}
+struct Cli {
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
 
-fn run_sync() -> Result<String, BackupError> {
+#[derive(Subcommand, Debug)]
+enum Commands {
+    /// Run backup procedure (this is the default)
+    Backup,
+
+    /// Report when backups were made
+    Latest,
+}
+
+fn run_command() -> Result<String, BackupError> {
+    let cli = Cli::parse();
     let configs = load_configs()?;
-    run_backup_procedure(&configs)
+
+    match &cli.command {
+        Some(Commands::Latest) => unimplemented!("Not ready!"),
+        Some(Commands::Backup) => run_backup_procedure(&configs),
+        None => run_backup_procedure(&configs),
+    }
 }
 
 fn main() -> ExitCode {
-    Cli::parse();
-
-    match run_sync() {
+    match run_command() {
         Ok(results) => {
             println!("{results}");
             ExitCode::SUCCESS
