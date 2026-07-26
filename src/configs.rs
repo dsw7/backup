@@ -32,22 +32,20 @@ pub struct Cold {
     pub destination: String,
 }
 
-fn read_config_file_to_toml_string(config_file_path: &PathBuf) -> Result<String, BackupError> {
-    match fs::read_to_string(config_file_path) {
+fn read_config_file_to_toml_string(config_path: &PathBuf) -> Result<String, BackupError> {
+    match fs::read_to_string(config_path) {
         Ok(contents) => Ok(contents),
-        Err(e) => {
-            return Err(BackupError(format!(
-                "Failed to read '{}': {e}",
-                config_file_path.display()
-            )));
-        }
+        Err(e) => Err(BackupError(format!(
+            "Failed to read '{}': {e}",
+            config_path.display()
+        ))),
     }
 }
 
 fn parse_toml_string(toml_str: &String) -> Result<Config, BackupError> {
     match toml::from_str::<Config>(toml_str) {
         Ok(config) => Ok(config),
-        Err(e) => return Err(BackupError(format!("Failed to parse TOML: {e}"))),
+        Err(e) => Err(BackupError(format!("Failed to parse TOML: {e}"))),
     }
 }
 
