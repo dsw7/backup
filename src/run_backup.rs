@@ -3,7 +3,9 @@ use std::process::{Command, ExitStatus};
 use crate::configs::Config;
 use crate::errors::BackupError;
 use crate::get_backup_options::select_backup_type;
-use crate::program_files::get_log_file_path;
+use crate::program_files::{get_log_file_path_cold, get_log_file_path_hot};
+
+use std::path::PathBuf;
 
 fn append_slash_to_source(source: &String) -> String {
     if source.ends_with('/') {
@@ -42,6 +44,14 @@ fn select_destination(sync_to_hot: bool, configs: &Config) -> String {
     }
 }
 
+fn select_log_file(sync_to_hot: bool) -> Result<PathBuf, BackupError> {
+    if sync_to_hot {
+        get_log_file_path_hot()
+    } else {
+        get_log_file_path_cold()
+    }
+}
+
 fn check_exit_status(exit_status: &ExitStatus) -> Result<String, BackupError> {
     if exit_status.success() {
         return Ok(String::from("Success!"));
@@ -53,12 +63,11 @@ fn check_exit_status(exit_status: &ExitStatus) -> Result<String, BackupError> {
     }
 }
 
-fn run_rsync(src: &String, dst: &String) -> Result<String, BackupError> {
-    let log_file_path = get_log_file_path()?;
+fn run_rsync(src: &String, dst: &String, log_file: &PathBuf) -> Result<String, BackupError> {
     let status = Command::new("rsync")
         .arg("-av")
         .arg("--delete")
-        .arg(format!("--log-file={}", log_file_path.display()))
+        .arg(format!("--log-file={}", log_file.display()))
         .arg(src)
         .arg(dst)
         .status()
@@ -70,8 +79,8 @@ fn run_rsync(src: &String, dst: &String) -> Result<String, BackupError> {
 fn run_rsync_dry_run(src: &String, dst: &String) -> Result<String, BackupError> {
     let status = Command::new("rsync")
         .arg("-av")
-        .arg("--dry-run")
         .arg("--delete")
+        .arg("--dry-run")
         .arg(src)
         .arg(dst)
         .status()
@@ -93,6 +102,7 @@ pub fn run_backup(configs: &Config) -> Result<String, BackupError> {
     if backup_options.is_dry_run {
         run_rsync_dry_run(&src, &dst)
     } else {
-        run_rsync(&src, &dst)
+        let log_file = select_log_file(backup_options.sync_to_hot)?;
+        run_rsync(&src, &dst, &log_file)
     }
 }
