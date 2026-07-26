@@ -1,11 +1,11 @@
-use std::process::{Command, ExitStatus};
-
 use crate::configs::Config;
 use crate::errors::BackupError;
-use crate::get_backup_options::select_backup_type;
 use crate::program_files::{get_log_file_path_cold, get_log_file_path_hot};
 
+use super::get_backup_options::select_backup_type;
+
 use std::path::PathBuf;
+use std::process::{Command, ExitStatus};
 
 fn append_slash_to_source(source: &String) -> String {
     if source.ends_with('/') {

@@ -1,12 +1,11 @@
 mod configs;
 mod errors;
-mod get_backup_options;
 mod program_files;
 mod run_backup;
 
 use configs::load_configs;
 use errors::BackupError;
-use run_backup::run_backup;
+use run_backup::rsync::run_backup;
 
 use std::process::ExitCode;
 
