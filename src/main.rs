@@ -1,11 +1,11 @@
-mod command_backup;
 mod configs;
 mod data_directory;
 mod errors;
+mod run_backup;
 
-use command_backup::run_backup_procedure;
 use configs::load_configs;
 use errors::BackupError;
+use run_backup::run_backup_procedure;
 
 use std::process::ExitCode;
 
