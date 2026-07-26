@@ -90,7 +90,7 @@ fn select_log_file(sync_to_hot: bool) -> Result<PathBuf, BackupError> {
     }
 }
 
-pub fn run_backup(configs: &Config) -> Result<String, BackupError> {
+pub fn run_backup_procedure(configs: &Config) -> Result<String, BackupError> {
     let (sync_to_hot, is_dry_run, exit_program) = select_backup_type();
 
     if exit_program {
