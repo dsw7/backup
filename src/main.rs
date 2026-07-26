@@ -3,7 +3,7 @@ mod configs;
 mod errors;
 mod program_files;
 
-use command_backup::run_backup_procedure::run_backup_procedure;
+use command_backup::run_backup_procedure;
 use configs::load_configs;
 use errors::BackupError;
 
