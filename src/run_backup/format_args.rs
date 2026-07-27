@@ -1,4 +1,8 @@
 use crate::configs::Configs;
+use crate::data_directory;
+
+use std::io;
+use std::path::PathBuf;
 
 pub fn format_src(source: &String) -> String {
     if source.ends_with('/') {
@@ -32,4 +36,14 @@ pub fn format_dst_cold(configs: &Configs) -> String {
         &configs.storage.cold.host,
         &configs.storage.cold.destination,
     )
+}
+
+pub fn select_log_file(sync_to_hot: bool) -> io::Result<PathBuf> {
+    let program_dir = data_directory::get_data_dir()?;
+
+    if sync_to_hot {
+        Ok(PathBuf::from(program_dir).join("backup_hot.log"))
+    } else {
+        Ok(PathBuf::from(program_dir).join("backup_cold.log"))
+    }
 }

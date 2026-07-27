@@ -1,12 +1,10 @@
 use crate::configs::Configs;
-use crate::data_directory;
 use crate::errors::BackupError;
 
 use super::format_args;
 use super::subprocesses;
 
 use std::io::{self, Write};
-use std::path::PathBuf;
 use std::str::FromStr;
 
 fn read_option_from_stdin() -> i32 {
@@ -44,16 +42,6 @@ fn select_backup_type() -> (bool, bool, bool) {
     (sync_to_hot, is_dry_run, exit_program)
 }
 
-fn select_log_file(sync_to_hot: bool) -> io::Result<PathBuf> {
-    let program_dir = data_directory::get_data_dir()?;
-
-    if sync_to_hot {
-        Ok(PathBuf::from(program_dir).join("backup_hot.log"))
-    } else {
-        Ok(PathBuf::from(program_dir).join("backup_cold.log"))
-    }
-}
-
 pub fn run_backup_procedure(configs: &Configs) -> Result<String, BackupError> {
     let (sync_to_hot, is_dry_run, exit_program) = select_backup_type();
 
@@ -72,7 +60,7 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<String, BackupError> {
     if is_dry_run {
         subprocesses::run_rsync_dry_run(&src, &dst)
     } else {
-        let log_file = select_log_file(sync_to_hot)?;
+        let log_file = format_args::select_log_file(sync_to_hot)?;
         subprocesses::run_rsync(&src, &dst, &log_file)
     }
 }
