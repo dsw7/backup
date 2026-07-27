@@ -27,7 +27,7 @@ enum Commands {
     Latest,
 }
 
-fn run_command() -> Result<String, BackupError> {
+fn run_command() -> Result<(), BackupError> {
     let cli = Cli::parse();
     let configs = load_configs()?;
 
@@ -40,10 +40,7 @@ fn run_command() -> Result<String, BackupError> {
 
 fn main() -> ExitCode {
     match run_command() {
-        Ok(results) => {
-            println!("{results}");
-            ExitCode::SUCCESS
-        }
+        Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
             eprintln!("{error}");
             ExitCode::FAILURE

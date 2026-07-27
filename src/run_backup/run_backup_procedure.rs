@@ -42,11 +42,12 @@ fn select_backup_type() -> (bool, bool, bool) {
     (sync_to_hot, is_dry_run, exit_program)
 }
 
-pub fn run_backup_procedure(configs: &Configs) -> Result<String, BackupError> {
+pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
     let (sync_to_hot, is_dry_run, exit_program) = select_backup_type();
 
     if exit_program {
-        return Ok(String::from("Program manually aborted"));
+        println!("Backup was manually aborted");
+        return Ok(());
     }
 
     let src = format_args::format_src(&configs.source);

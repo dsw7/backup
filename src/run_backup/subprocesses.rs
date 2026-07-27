@@ -3,9 +3,9 @@ use crate::errors::BackupError;
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus};
 
-fn check_exit_status(exit_status: &ExitStatus) -> Result<String, BackupError> {
+fn check_exit_status(exit_status: &ExitStatus) -> Result<(), BackupError> {
     if exit_status.success() {
-        return Ok(String::from("Success!"));
+        return Ok(());
     }
 
     match exit_status.code() {
@@ -16,7 +16,7 @@ fn check_exit_status(exit_status: &ExitStatus) -> Result<String, BackupError> {
     }
 }
 
-pub fn run_rsync(src: &String, dst: &String, log_file: &PathBuf) -> Result<String, BackupError> {
+pub fn run_rsync(src: &String, dst: &String, log_file: &PathBuf) -> Result<(), BackupError> {
     let status = Command::new("rsync")
         .arg("-av")
         .arg("--delete")
@@ -29,7 +29,7 @@ pub fn run_rsync(src: &String, dst: &String, log_file: &PathBuf) -> Result<Strin
     check_exit_status(&status)
 }
 
-pub fn run_rsync_dry_run(src: &String, dst: &String) -> Result<String, BackupError> {
+pub fn run_rsync_dry_run(src: &String, dst: &String) -> Result<(), BackupError> {
     let status = Command::new("rsync")
         .arg("-av")
         .arg("--delete")
