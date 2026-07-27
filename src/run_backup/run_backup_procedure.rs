@@ -80,7 +80,7 @@ fn select_destination(sync_to_hot: bool, configs: &Config) -> String {
     }
 }
 
-fn select_log_file(sync_to_hot: bool) -> Result<PathBuf, BackupError> {
+fn select_log_file(sync_to_hot: bool) -> io::Result<PathBuf> {
     let program_dir = data_directory::get_data_dir()?;
 
     if sync_to_hot {
