@@ -44,35 +44,6 @@ fn select_backup_type() -> (bool, bool, bool) {
     (sync_to_hot, is_dry_run, exit_program)
 }
 
-fn remove_slash_from_destination(destination: &String) -> String {
-    if destination.ends_with('/') {
-        String::from(&destination[..destination.len() - 1])
-    } else {
-        String::from(destination)
-    }
-}
-
-fn format_destination(user: &String, host: &String, destination: &String) -> String {
-    let dst = remove_slash_from_destination(destination);
-    format!("{user}@{host}:{dst}")
-}
-
-fn select_destination(sync_to_hot: bool, configs: &Configs) -> String {
-    if sync_to_hot {
-        format_destination(
-            &configs.storage.hot.user,
-            &configs.storage.hot.host,
-            &configs.storage.hot.destination,
-        )
-    } else {
-        format_destination(
-            &configs.storage.cold.user,
-            &configs.storage.cold.host,
-            &configs.storage.cold.destination,
-        )
-    }
-}
-
 fn select_log_file(sync_to_hot: bool) -> io::Result<PathBuf> {
     let program_dir = data_directory::get_data_dir()?;
 
@@ -91,7 +62,12 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<String, BackupError> {
     }
 
     let src = format_args::format_src(&configs.source);
-    let dst = select_destination(sync_to_hot, &configs);
+
+    let dst = if sync_to_hot {
+        format_args::format_dst_hot(&configs)
+    } else {
+        format_args::format_dst_cold(&configs)
+    };
 
     if is_dry_run {
         subprocesses::run_rsync_dry_run(&src, &dst)
