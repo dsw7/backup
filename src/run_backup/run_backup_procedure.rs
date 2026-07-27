@@ -25,7 +25,7 @@ fn read_option_from_stdin() -> i32 {
     }
 }
 
-fn select_backup_type() -> (bool, bool, bool) {
+pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
     println!("Select backup type:");
     println!("[1] -> Synchronize directories to HOT storage");
     println!("[2] -> Synchronize directories to HOT storage [DRY RUN]");
@@ -35,20 +35,13 @@ fn select_backup_type() -> (bool, bool, bool) {
 
     let option = read_option_from_stdin();
 
-    let sync_to_hot = matches!(option, 1 | 2);
-    let is_dry_run = matches!(option, 2 | 4);
-    let exit_program = option < 1 || option > 4;
-
-    (sync_to_hot, is_dry_run, exit_program)
-}
-
-pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
-    let (sync_to_hot, is_dry_run, exit_program) = select_backup_type();
-
-    if exit_program {
+    if option < 1 || option > 4 {
         println!("Backup was manually aborted");
         return Ok(());
     }
+
+    let sync_to_hot = matches!(option, 1 | 2);
+    let is_dry_run = matches!(option, 2 | 4);
 
     let src = format_args::format_src(&configs.source);
 
