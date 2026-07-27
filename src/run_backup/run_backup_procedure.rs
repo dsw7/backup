@@ -2,6 +2,7 @@ use crate::configs::Configs;
 use crate::data_directory;
 use crate::errors::BackupError;
 
+use super::format_args;
 use super::subprocesses;
 
 use std::io::{self, Write};
@@ -41,14 +42,6 @@ fn select_backup_type() -> (bool, bool, bool) {
     let exit_program = option < 1 || option > 4;
 
     (sync_to_hot, is_dry_run, exit_program)
-}
-
-fn append_slash_to_source(source: &String) -> String {
-    if source.ends_with('/') {
-        String::from(source)
-    } else {
-        String::from(format!("{source}/"))
-    }
 }
 
 fn remove_slash_from_destination(destination: &String) -> String {
@@ -97,7 +90,7 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<String, BackupError> {
         return Ok(String::from("Program manually aborted"));
     }
 
-    let src = append_slash_to_source(&configs.source);
+    let src = format_args::format_src(&configs.source);
     let dst = select_destination(sync_to_hot, &configs);
 
     if is_dry_run {
