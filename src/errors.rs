@@ -1,16 +1,14 @@
-use std::fmt;
+use std::io;
+use thiserror::Error;
 
-#[derive(Debug, Clone)]
-pub struct BackupError(pub String);
+#[derive(Error, Debug)]
+pub enum BackupError {
+    #[error("An I/O error occurred: {source}")]
+    Io {
+        #[from]
+        source: io::Error,
+    },
 
-impl fmt::Display for BackupError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-impl From<String> for BackupError {
-    fn from(msg: String) -> Self {
-        BackupError(msg)
-    }
+    #[error("{0}")]
+    Other(String),
 }

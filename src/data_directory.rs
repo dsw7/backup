@@ -6,7 +6,9 @@ use std::path::PathBuf;
 fn get_home_dir() -> Result<PathBuf, BackupError> {
     match env::home_dir() {
         Some(path) => Ok(path),
-        None => Err(BackupError(String::from("Couldn't get home directory"))),
+        None => Err(BackupError::Other(String::from(
+            "Couldn't get home directory",
+        ))),
     }
 }
 
@@ -17,7 +19,7 @@ pub fn get_data_dir() -> Result<PathBuf, BackupError> {
     if program_dir.exists() {
         Ok(program_dir)
     } else {
-        Err(BackupError(format!(
+        Err(BackupError::Other(format!(
             "Directory '{}' does not exist",
             program_dir.display()
         )))
