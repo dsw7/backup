@@ -9,9 +9,7 @@ fn check_exit_status(exit_status: &ExitStatus) -> Result<String, BackupError> {
     }
 
     match exit_status.code() {
-        Some(code) => Err(BackupError::Other(format!(
-            "Subprocess exited with code {code}"
-        ))),
+        Some(code) => Err(BackupError::SubprocessError(code)),
         None => Err(BackupError::Other(String::from(
             "Subprocess terminated by signal",
         ))),
