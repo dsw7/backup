@@ -1,4 +1,4 @@
-use crate::configs::Config;
+use crate::configs::Configs;
 use crate::data_directory;
 use crate::errors::BackupError;
 
@@ -64,7 +64,7 @@ fn format_destination(user: &String, host: &String, destination: &String) -> Str
     format!("{user}@{host}:{dst}")
 }
 
-fn select_destination(sync_to_hot: bool, configs: &Config) -> String {
+fn select_destination(sync_to_hot: bool, configs: &Configs) -> String {
     if sync_to_hot {
         format_destination(
             &configs.storage.hot.user,
@@ -90,7 +90,7 @@ fn select_log_file(sync_to_hot: bool) -> io::Result<PathBuf> {
     }
 }
 
-pub fn run_backup_procedure(configs: &Config) -> Result<String, BackupError> {
+pub fn run_backup_procedure(configs: &Configs) -> Result<String, BackupError> {
     let (sync_to_hot, is_dry_run, exit_program) = select_backup_type();
 
     if exit_program {

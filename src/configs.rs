@@ -7,7 +7,7 @@ use std::fs;
 use std::path::PathBuf;
 
 #[derive(Deserialize, Debug)]
-pub struct Config {
+pub struct Configs {
     pub source: String,
     pub storage: Storage,
 }
@@ -44,14 +44,14 @@ fn read_config_file_to_toml_string(config_file: &PathBuf) -> Result<String, Back
     }
 }
 
-fn parse_toml_string(toml_str: &String) -> Result<Config, BackupError> {
-    match toml::from_str::<Config>(toml_str) {
+fn parse_toml_string(toml_str: &String) -> Result<Configs, BackupError> {
+    match toml::from_str::<Configs>(toml_str) {
         Ok(config) => Ok(config),
         Err(e) => Err(BackupError::ConfigurationError(e.to_string())),
     }
 }
 
-pub fn load_configs() -> Result<Config, BackupError> {
+pub fn load_configs() -> Result<Configs, BackupError> {
     let config_file = get_config_file_path()?;
     let toml_str = read_config_file_to_toml_string(&config_file)?;
     let configs = parse_toml_string(&toml_str)?;
