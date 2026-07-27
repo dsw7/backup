@@ -9,6 +9,9 @@ pub enum BackupError {
         source: io::Error,
     },
 
+    #[error("Failed to load configurations: {0}")]
+    ConfigurationError(String),
+
     #[error("{0}")]
     Other(String),
 }

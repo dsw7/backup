@@ -40,17 +40,14 @@ fn get_config_file_path() -> Result<PathBuf, BackupError> {
 fn read_config_file_to_toml_string(config_file: &PathBuf) -> Result<String, BackupError> {
     match fs::read_to_string(config_file) {
         Ok(contents) => Ok(contents),
-        Err(e) => Err(BackupError::Other(format!(
-            "Failed to read '{}': {e}",
-            config_file.display()
-        ))),
+        Err(e) => Err(BackupError::ConfigurationError(e.to_string())),
     }
 }
 
 fn parse_toml_string(toml_str: &String) -> Result<Config, BackupError> {
     match toml::from_str::<Config>(toml_str) {
         Ok(config) => Ok(config),
-        Err(e) => Err(BackupError::Other(format!("Failed to parse TOML: {e}"))),
+        Err(e) => Err(BackupError::ConfigurationError(e.to_string())),
     }
 }
 
