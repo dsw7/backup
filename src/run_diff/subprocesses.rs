@@ -1,7 +1,6 @@
 use crate::configs::Configs;
 use crate::errors::BackupError;
 
-use std::num::ParseIntError;
 use std::process::{Command, Output, Stdio};
 
 fn get_ssh_dest_hot(configs: &Configs) -> String {
@@ -26,8 +25,14 @@ fn extract_stderr(output: &Output) -> String {
     String::from_utf8_lossy(&output.stderr).trim().to_owned()
 }
 
-fn get_usage_and_path_from_stdout(stdout: &String) -> Result<(usize, String), ParseIntError> {
+fn get_usage_and_path_from_stdout(stdout: &String) -> Result<(usize, String), BackupError> {
     let parts: Vec<&str> = stdout.split_whitespace().collect();
+
+    if parts.len() != 2 {
+        return Err(BackupError::Other(
+            "The stdout does not contain exactly two components".into(),
+        ));
+    }
 
     let usage_bytes = parts[0].parse::<usize>()?;
     let path = parts[1].to_owned();
@@ -42,7 +47,7 @@ pub struct Usage {
     pub usage_bytes: usize,
 }
 
-fn unpack_output(host: &String, output: &Output) -> Result<Usage, ParseIntError> {
+fn unpack_output(host: &String, output: &Output) -> Result<Usage, BackupError> {
     let (usage_bytes, path) = if output.status.success() {
         let stdout = extract_stdout(&output);
         get_usage_and_path_from_stdout(&stdout)?
