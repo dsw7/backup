@@ -7,22 +7,19 @@ use super::subprocesses;
 use std::io::{self, Write};
 use std::str::FromStr;
 
-fn read_option_from_stdin() -> i32 {
+fn read_option_from_stdin() -> io::Result<i32> {
     print!("> ");
-    io::stdout()
-        .flush()
-        .expect("Unrecoverable error: Failed to flush stdout");
+    io::stdout().flush()?;
 
     let mut input = String::new();
+    io::stdin().read_line(&mut input)?;
 
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Unrecoverable error: Failed to read from stdin");
-
-    match i32::from_str(input.trim()) {
+    let option = match i32::from_str(input.trim()) {
         Ok(val) => val,
         Err(_) => 0,
-    }
+    };
+
+    Ok(option)
 }
 
 pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
@@ -33,7 +30,7 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
     println!("[4] -> Synchronize directories to COLD storage [DRY RUN]");
     println!("[*] -> Exit program");
 
-    let option = read_option_from_stdin();
+    let option = read_option_from_stdin()?;
 
     if option < 1 || option > 4 {
         println!("Backup was manually aborted");
