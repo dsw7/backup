@@ -26,7 +26,7 @@ pub struct Usage {
 
 fn unpack_output(host: &String, output: &Output) -> Usage {
     let stdout = if output.status.success() {
-        String::from_utf8_lossy(&output.stdout).into_owned()
+        String::from_utf8_lossy(&output.stdout).trim().to_owned()
     } else {
         String::from("-")
     };
@@ -35,7 +35,7 @@ fn unpack_output(host: &String, output: &Output) -> Usage {
         failed: output.status.success(),
         host: String::from(host),
         stdout: stdout,
-        stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
+        stderr: String::from_utf8_lossy(&output.stderr).trim().to_owned(),
     }
 }
 
