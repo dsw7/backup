@@ -52,8 +52,6 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
     let sync_to_hot = matches!(option, 1 | 2);
     let is_dry_run = matches!(option, 2 | 4);
 
-    let src = format_args::format_src(&configs.source);
-
     let dst = if sync_to_hot {
         format_args::format_dst_hot(&configs)
     } else {
@@ -61,9 +59,9 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
     };
 
     if is_dry_run {
-        subprocesses::run_rsync_dry_run(&src, &dst)
+        subprocesses::run_rsync_dry_run(&configs.source, &dst)
     } else {
         let log_file = select_log_file(sync_to_hot)?;
-        subprocesses::run_rsync(&src, &dst, &log_file)
+        subprocesses::run_rsync(&configs.source, &dst, &log_file)
     }
 }

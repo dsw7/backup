@@ -3,12 +3,20 @@ use crate::errors::BackupError;
 use std::path::PathBuf;
 use std::process::Command;
 
+fn append_slash_to_src(src: &String) -> String {
+    if src.ends_with('/') {
+        String::from(src)
+    } else {
+        String::from(format!("{src}/"))
+    }
+}
+
 pub fn run_rsync(src: &String, dst: &String, log_file: &PathBuf) -> Result<(), BackupError> {
     let status = Command::new("rsync")
         .arg("-av")
         .arg("--delete")
         .arg(format!("--log-file={}", log_file.display()))
-        .arg(src)
+        .arg(append_slash_to_src(&src))
         .arg(dst)
         .status()?;
 
@@ -23,7 +31,7 @@ pub fn run_rsync_dry_run(src: &String, dst: &String) -> Result<(), BackupError> 
         .arg("-av")
         .arg("--delete")
         .arg("--dry-run")
-        .arg(src)
+        .arg(append_slash_to_src(&src))
         .arg(dst)
         .status()?;
 

@@ -1,13 +1,5 @@
 use crate::configs::Configs;
 
-pub fn format_src(source: &String) -> String {
-    if source.ends_with('/') {
-        String::from(source)
-    } else {
-        String::from(format!("{source}/"))
-    }
-}
-
 fn format_dst(user: &String, host: &String, destination: &String) -> String {
     let dst = if destination.ends_with('/') {
         String::from(&destination[..destination.len() - 1])
