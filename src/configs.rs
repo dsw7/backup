@@ -54,6 +54,5 @@ fn parse_toml_string(toml_str: &String) -> Result<Configs, BackupError> {
 pub fn load_configs() -> Result<Configs, BackupError> {
     let config_file = get_config_file_path()?;
     let toml_str = read_config_file_to_toml_string(&config_file)?;
-    let configs = parse_toml_string(&toml_str)?;
-    Ok(configs)
+    parse_toml_string(&toml_str)
 }
