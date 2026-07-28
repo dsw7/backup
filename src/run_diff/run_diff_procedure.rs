@@ -5,7 +5,7 @@ use super::subprocesses::{Usage, get_disk_usages};
 
 fn display_usages(usages: Vec<Usage>) {
     for usage in usages {
-        println!("{} {}", usage.host, usage.stdout);
+        println!("{} {} {}", usage.host, usage.path, usage.usage_bytes);
     }
 }
 
@@ -24,6 +24,7 @@ pub fn run_diff_procedure(configs: &Configs) -> Result<(), BackupError> {
     let failed_usages = partition_usages(&mut usages);
 
     display_usages(usages);
+    println!();
     display_failed_usages(failed_usages);
 
     Ok(())

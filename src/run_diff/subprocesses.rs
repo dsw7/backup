@@ -25,25 +25,36 @@ fn extract_stderr(output: &Output) -> String {
     String::from_utf8_lossy(&output.stderr).trim().to_owned()
 }
 
+fn get_stdout_parts(stdout: &String) -> (String, String) {
+    let parts: Vec<&str> = stdout.split_whitespace().collect();
+    let usage_bytes = parts[0].to_owned();
+    let path = parts[1].to_owned();
+
+    (usage_bytes, path)
+}
+
 pub struct Usage {
     pub failed: bool,
     pub host: String,
     pub stderr: String,
-    pub stdout: String,
+    pub path: String,
+    pub usage_bytes: String,
 }
 
 fn unpack_output(host: &String, output: &Output) -> Usage {
-    let stdout = if output.status.success() {
-        extract_stdout(&output)
+    let (usage_bytes, path) = if output.status.success() {
+        let stdout = extract_stdout(&output);
+        get_stdout_parts(&stdout)
     } else {
-        String::from("-")
+        (String::from("-"), String::from("-"))
     };
 
     Usage {
         failed: output.status.success(),
         host: String::from(host),
-        stdout: stdout,
         stderr: extract_stderr(&output),
+        path: path,
+        usage_bytes: usage_bytes,
     }
 }
 
