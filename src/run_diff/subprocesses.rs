@@ -25,50 +25,23 @@ fn extract_stderr(output: &Output) -> String {
     String::from_utf8_lossy(&output.stderr).trim().to_owned()
 }
 
-fn get_usage_and_path_from_stdout(stdout: &String) -> Result<(usize, String), BackupError> {
-    let parts: Vec<&str> = stdout.split_whitespace().collect();
-
-    if parts.len() != 2 {
-        return Err(BackupError::Other(
-            "The stdout does not contain exactly two components".into(),
-        ));
-    }
-
-    let usage_bytes = parts[0].parse::<usize>()?;
-    let path = parts[1].to_owned();
-    Ok((usage_bytes, path))
-}
-
 pub enum Usage {
-    Success {
-        host: String,
-        path: String,
-        usage_bytes: usize,
-    },
-    Failure {
-        host: String,
-        stderr: String,
-    },
+    Success { host: String, stdout: String },
+    Failure { host: String, stderr: String },
 }
 
-fn unpack_output(host: &String, output: &Output) -> Result<Usage, BackupError> {
-    let result = if output.status.success() {
-        let stdout = extract_stdout(&output);
-        let (usage_bytes, path) = get_usage_and_path_from_stdout(&stdout)?;
-
+fn unpack_output(host: &String, output: &Output) -> Usage {
+    if output.status.success() {
         Usage::Success {
             host: String::from(host),
-            path: path,
-            usage_bytes: usage_bytes,
+            stdout: extract_stdout(&output),
         }
     } else {
         Usage::Failure {
             host: String::from(host),
             stderr: extract_stderr(&output),
         }
-    };
-
-    Ok(result)
+    }
 }
 
 pub fn get_disk_usages(configs: &Configs) -> Result<Vec<Usage>, BackupError> {
@@ -96,9 +69,11 @@ pub fn get_disk_usages(configs: &Configs) -> Result<Vec<Usage>, BackupError> {
     let output_hot_backup = proc_hot_backup.wait_with_output()?;
     let output_cold_backup = proc_cold_backup.wait_with_output()?;
 
-    let usage_localhost = unpack_output(&String::from("localhost"), &output_localhost)?;
-    let usage_hot_backup = unpack_output(&configs.storage.hot.host, &output_hot_backup)?;
-    let usage_cold_backup = unpack_output(&configs.storage.cold.host, &output_cold_backup)?;
+    let results = vec![
+        unpack_output(&String::from("localhost"), &output_localhost),
+        unpack_output(&configs.storage.hot.host, &output_hot_backup),
+        unpack_output(&configs.storage.cold.host, &output_cold_backup),
+    ];
 
-    Ok(vec![usage_localhost, usage_hot_backup, usage_cold_backup])
+    Ok(results)
 }
