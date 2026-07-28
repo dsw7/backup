@@ -1,20 +1,7 @@
 use crate::errors::BackupError;
 
 use std::path::PathBuf;
-use std::process::{Command, ExitStatus};
-
-fn check_exit_status(exit_status: &ExitStatus) -> Result<(), BackupError> {
-    if exit_status.success() {
-        return Ok(());
-    }
-
-    match exit_status.code() {
-        Some(code) => Err(BackupError::SubprocessError(code)),
-        None => Err(BackupError::Other(String::from(
-            "Subprocess terminated by signal",
-        ))),
-    }
-}
+use std::process::{Command };
 
 pub fn run_rsync(src: &String, dst: &String, log_file: &PathBuf) -> Result<(), BackupError> {
     let status = Command::new("rsync")
@@ -26,7 +13,10 @@ pub fn run_rsync(src: &String, dst: &String, log_file: &PathBuf) -> Result<(), B
         .status()
         .expect("Command failed to start. There is no way to proceed");
 
-    check_exit_status(&status)
+    if !status.success() {
+        eprintln!("Synchronization failed");
+    }
+    Ok(())
 }
 
 pub fn run_rsync_dry_run(src: &String, dst: &String) -> Result<(), BackupError> {
@@ -39,5 +29,8 @@ pub fn run_rsync_dry_run(src: &String, dst: &String) -> Result<(), BackupError> 
         .status()
         .expect("Command failed to start. There is no way to proceed");
 
-    check_exit_status(&status)
+    if !status.success() {
+        eprintln!("Synchronization failed");
+    }
+    Ok(())
 }
