@@ -11,6 +11,14 @@ fn append_slash_to_src(src: &String) -> String {
     }
 }
 
+fn remove_slash_from_dst(dst: &String) -> String {
+    if dst.ends_with('/') {
+        String::from(&dst[..dst.len() - 1])
+    } else {
+        String::from(dst)
+    }
+}
+
 pub fn run_rsync(src: &String, dst: &String, log_file: &PathBuf) -> Result<(), BackupError> {
     let status = Command::new("rsync")
         .arg("-av")
