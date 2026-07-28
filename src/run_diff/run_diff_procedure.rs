@@ -9,6 +9,7 @@ fn display_usages(usages: &Vec<Usage>) {
         "{:<20} {:<25} {:<15}",
         "-------------------", "------------------------", "---------------"
     );
+
     for usage in usages {
         if let Usage::Success {
             host,
@@ -22,9 +23,15 @@ fn display_usages(usages: &Vec<Usage>) {
 }
 
 fn display_failed_usages(usages: &Vec<Usage>) {
+    println!("{:<20} {:<25}", "Host", "Error");
+    println!(
+        "{:<20} {:<25}",
+        "-------------------", "------------------------"
+    );
+
     for usage in usages {
         if let Usage::Failure { host, stderr } = usage {
-            println!("{} -> {}", host, stderr);
+            println!("{:<20} {:<25}", host, stderr);
         }
     }
 }
