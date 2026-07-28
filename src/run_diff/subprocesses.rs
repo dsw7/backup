@@ -39,31 +39,36 @@ fn get_usage_and_path_from_stdout(stdout: &String) -> Result<(usize, String), Ba
     Ok((usage_bytes, path))
 }
 
-pub struct Usage {
-    pub failed: bool,
-    pub host: String,
-    pub path: String,
-    pub stderr: String,
-    pub usage_bytes: usize,
+pub enum Usage {
+    Success {
+        host: String,
+        path: String,
+        usage_bytes: usize,
+    },
+    Failure {
+        host: String,
+        stderr: String,
+    },
 }
 
 fn unpack_output(host: &String, output: &Output) -> Result<Usage, BackupError> {
-    let (usage_bytes, path) = if output.status.success() {
+    let result = if output.status.success() {
         let stdout = extract_stdout(&output);
-        get_usage_and_path_from_stdout(&stdout)?
+        let (usage_bytes, path) = get_usage_and_path_from_stdout(&stdout)?;
+
+        Usage::Success {
+            host: String::from(host),
+            path: path,
+            usage_bytes: usage_bytes,
+        }
     } else {
-        (0, String::from("-"))
+        Usage::Failure {
+            host: String::from(host),
+            stderr: extract_stderr(&output),
+        }
     };
 
-    let usage = Usage {
-        failed: output.status.success(),
-        host: String::from(host),
-        path: path,
-        stderr: extract_stderr(&output),
-        usage_bytes: usage_bytes,
-    };
-
-    Ok(usage)
+    Ok(result)
 }
 
 pub fn get_disk_usages(configs: &Configs) -> Result<Vec<Usage>, BackupError> {
