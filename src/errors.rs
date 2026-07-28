@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 use std::io;
+use std::num;
 
 #[derive(Error, Debug)]
 pub enum BackupError {
@@ -8,6 +9,12 @@ pub enum BackupError {
     Io {
         #[from]
         source: io::Error,
+    },
+
+    #[error("A parsing error occurred: {source}")]
+    ParseInt {
+        #[from]
+        source: num::ParseIntError,
     },
 
     #[error("Failed to load configurations: {0}")]
