@@ -4,14 +4,22 @@ use crate::errors::BackupError;
 use super::subprocesses::{Usage, get_disk_usages};
 
 fn display_usages(usages: Vec<Usage>) {
+    println!("{:<20} {:<25} {:<15}", "Host", "Path", "Usage (bytes)");
+    println!(
+        "{:<20} {:<25} {:<15}",
+        "-------------------", "------------------------", "---------------"
+    );
     for usage in usages {
-        println!("{} {} {}", usage.host, usage.path, usage.usage_bytes);
+        println!(
+            "{:<20} {:<25} {:<15}",
+            usage.host, usage.path, usage.usage_bytes
+        );
     }
 }
 
 fn display_failed_usages(failed_usages: Vec<Usage>) {
     for usage in failed_usages {
-        println!("{} {}", usage.host, usage.stderr);
+        println!("{} -> {}", usage.host, usage.stderr);
     }
 }
 
