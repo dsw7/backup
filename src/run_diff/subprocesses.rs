@@ -1,6 +1,7 @@
 use crate::configs::Configs;
+use crate::errors::BackupError;
 
-use std::io;
+use std::num::ParseIntError;
 use std::process::{Command, Output, Stdio};
 
 fn get_ssh_dest_hot(configs: &Configs) -> String {
@@ -25,40 +26,42 @@ fn extract_stderr(output: &Output) -> String {
     String::from_utf8_lossy(&output.stderr).trim().to_owned()
 }
 
-fn get_stdout_parts(stdout: &String) -> (String, String) {
+fn get_usage_and_path_from_stdout(stdout: &String) -> Result<(usize, String), ParseIntError> {
     let parts: Vec<&str> = stdout.split_whitespace().collect();
-    let usage_bytes = parts[0].to_owned();
-    let path = parts[1].to_owned();
 
-    (usage_bytes, path)
+    let usage_bytes = parts[0].parse::<usize>()?;
+    let path = parts[1].to_owned();
+    Ok((usage_bytes, path))
 }
 
 pub struct Usage {
     pub failed: bool,
     pub host: String,
-    pub stderr: String,
     pub path: String,
-    pub usage_bytes: String,
+    pub stderr: String,
+    pub usage_bytes: usize,
 }
 
-fn unpack_output(host: &String, output: &Output) -> Usage {
+fn unpack_output(host: &String, output: &Output) -> Result<Usage, ParseIntError> {
     let (usage_bytes, path) = if output.status.success() {
         let stdout = extract_stdout(&output);
-        get_stdout_parts(&stdout)
+        get_usage_and_path_from_stdout(&stdout)?
     } else {
-        (String::from("-"), String::from("-"))
+        (0, String::from("-"))
     };
 
-    Usage {
+    let usage = Usage {
         failed: output.status.success(),
         host: String::from(host),
-        stderr: extract_stderr(&output),
         path: path,
+        stderr: extract_stderr(&output),
         usage_bytes: usage_bytes,
-    }
+    };
+
+    Ok(usage)
 }
 
-pub fn get_disk_usages(configs: &Configs) -> io::Result<Vec<Usage>> {
+pub fn get_disk_usages(configs: &Configs) -> Result<Vec<Usage>, BackupError> {
     let proc_localhost = Command::new("du")
         .args(["--summarize", "--bytes", &configs.source])
         .stdout(Stdio::piped())
@@ -83,11 +86,9 @@ pub fn get_disk_usages(configs: &Configs) -> io::Result<Vec<Usage>> {
     let output_hot_backup = proc_hot_backup.wait_with_output()?;
     let output_cold_backup = proc_cold_backup.wait_with_output()?;
 
-    let usages = vec![
-        unpack_output(&String::from("localhost"), &output_localhost),
-        unpack_output(&configs.storage.hot.host, &output_hot_backup),
-        unpack_output(&configs.storage.cold.host, &output_cold_backup),
-    ];
+    let usage_localhost = unpack_output(&String::from("localhost"), &output_localhost)?;
+    let usage_hot_backup = unpack_output(&configs.storage.hot.host, &output_hot_backup)?;
+    let usage_cold_backup = unpack_output(&configs.storage.cold.host, &output_cold_backup)?;
 
-    Ok(usages)
+    Ok(vec![usage_localhost, usage_hot_backup, usage_cold_backup])
 }
