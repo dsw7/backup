@@ -2,12 +2,14 @@ mod configs;
 mod data_directory;
 mod errors;
 mod run_backup;
+mod run_diff;
 
 use clap::{Parser, Subcommand};
 
 use configs::load_configs;
 use errors::BackupError;
 use run_backup::run_backup_procedure;
+use run_diff::run_diff_procedure;
 
 use std::process::ExitCode;
 
@@ -36,7 +38,7 @@ fn run_command() -> Result<(), BackupError> {
 
     match &cli.command {
         Some(Commands::Backup) => run_backup_procedure(&configs),
-        Some(Commands::Diff) => unimplemented!("Not ready!"),
+        Some(Commands::Diff) => run_diff_procedure(&configs),
         Some(Commands::Latest) => unimplemented!("Not ready!"),
         None => run_backup_procedure(&configs),
     }
