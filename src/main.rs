@@ -25,6 +25,9 @@ enum Commands {
 
     /// Report when backups were made
     Latest,
+
+    /// Compare local and remote backup directory sizes
+    Diff,
 }
 
 fn run_command() -> Result<(), BackupError> {
@@ -32,8 +35,9 @@ fn run_command() -> Result<(), BackupError> {
     let configs = load_configs()?;
 
     match &cli.command {
-        Some(Commands::Latest) => unimplemented!("Not ready!"),
         Some(Commands::Backup) => run_backup_procedure(&configs),
+        Some(Commands::Diff) => unimplemented!("Not ready!"),
+        Some(Commands::Latest) => unimplemented!("Not ready!"),
         None => run_backup_procedure(&configs),
     }
 }
