@@ -17,6 +17,14 @@ fn get_ssh_dest_cold(configs: &Configs) -> String {
     )
 }
 
+fn extract_stdout(output: &Output) -> String {
+    String::from_utf8_lossy(&output.stdout).trim().to_owned()
+}
+
+fn extract_stderr(output: &Output) -> String {
+    String::from_utf8_lossy(&output.stderr).trim().to_owned()
+}
+
 pub struct Usage {
     pub failed: bool,
     pub host: String,
@@ -26,7 +34,7 @@ pub struct Usage {
 
 fn unpack_output(host: &String, output: &Output) -> Usage {
     let stdout = if output.status.success() {
-        String::from_utf8_lossy(&output.stdout).trim().to_owned()
+        extract_stdout(&output)
     } else {
         String::from("-")
     };
@@ -35,7 +43,7 @@ fn unpack_output(host: &String, output: &Output) -> Usage {
         failed: output.status.success(),
         host: String::from(host),
         stdout: stdout,
-        stderr: String::from_utf8_lossy(&output.stderr).trim().to_owned(),
+        stderr: extract_stderr(&output),
     }
 }
 
