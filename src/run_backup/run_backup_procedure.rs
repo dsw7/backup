@@ -2,7 +2,6 @@ use crate::configs::Configs;
 use crate::data_directory::get_data_dir;
 use crate::errors::BackupError;
 
-use super::format_args;
 use super::subprocesses;
 
 use std::io::{self, Write};
@@ -22,6 +21,30 @@ fn read_option_from_stdin() -> io::Result<i32> {
     };
 
     Ok(option)
+}
+
+fn select_user(sync_to_hot: bool, configs: &Configs) -> &String {
+    if sync_to_hot {
+        &configs.storage.hot.user
+    } else {
+        &configs.storage.cold.user
+    }
+}
+
+fn select_host(sync_to_hot: bool, configs: &Configs) -> &String {
+    if sync_to_hot {
+        &configs.storage.hot.host
+    } else {
+        &configs.storage.cold.host
+    }
+}
+
+fn select_destination(sync_to_hot: bool, configs: &Configs) -> &String {
+    if sync_to_hot {
+        &configs.storage.hot.destination
+    } else {
+        &configs.storage.cold.destination
+    }
 }
 
 fn select_log_file(sync_to_hot: bool) -> io::Result<PathBuf> {
@@ -52,16 +75,14 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
     let sync_to_hot = matches!(option, 1 | 2);
     let is_dry_run = matches!(option, 2 | 4);
 
-    let dst = if sync_to_hot {
-        format_args::format_dst_hot(&configs)
-    } else {
-        format_args::format_dst_cold(&configs)
-    };
+    let user = select_user(sync_to_hot, &configs);
+    let host = select_host(sync_to_hot, &configs);
+    let destination = select_destination(sync_to_hot, &configs);
 
     if is_dry_run {
-        subprocesses::run_rsync_dry_run(&configs.source, &dst)
+        subprocesses::run_rsync_dry_run(&configs.source, &user, &host, &destination)
     } else {
         let log_file = select_log_file(sync_to_hot)?;
-        subprocesses::run_rsync(&configs.source, &dst, &log_file)
+        subprocesses::run_rsync(&configs.source, &user, &host, &destination, &log_file)
     }
 }

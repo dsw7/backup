@@ -19,32 +19,45 @@ fn remove_slash_from_dst(dst: &String) -> String {
     }
 }
 
-pub fn run_rsync(src: &String, dst: &String, log_file: &PathBuf) -> Result<(), BackupError> {
+pub fn run_rsync(
+    src: &String,
+    user: &String,
+    host: &String,
+    dst: &String,
+    log_file: &PathBuf,
+) -> Result<(), BackupError> {
     let status = Command::new("rsync")
         .arg("-av")
         .arg("--delete")
         .arg(format!("--log-file={}", log_file.display()))
         .arg(append_slash_to_src(&src))
-        .arg(dst)
+        .arg(format!("{user}@{host}:{}", remove_slash_from_dst(&dst)))
         .status()?;
 
     if !status.success() {
         eprintln!("Synchronization failed");
     }
+
     Ok(())
 }
 
-pub fn run_rsync_dry_run(src: &String, dst: &String) -> Result<(), BackupError> {
+pub fn run_rsync_dry_run(
+    src: &String,
+    user: &String,
+    host: &String,
+    dst: &String,
+) -> Result<(), BackupError> {
     let status = Command::new("rsync2")
         .arg("-av")
         .arg("--delete")
         .arg("--dry-run")
         .arg(append_slash_to_src(&src))
-        .arg(dst)
+        .arg(format!("{user}@{host}:{}", remove_slash_from_dst(&dst)))
         .status()?;
 
     if !status.success() {
         eprintln!("Synchronization failed");
     }
+
     Ok(())
 }
