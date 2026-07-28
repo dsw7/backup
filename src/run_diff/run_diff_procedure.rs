@@ -4,16 +4,20 @@ use crate::errors::BackupError;
 use std::io;
 use std::process::Command;
 
+fn get_ssh_dest_hot(configs: &Configs) -> String {
+    format!(
+        "{}@{}",
+        &configs.storage.hot.user, &configs.storage.hot.host
+    )
+}
+
 fn get_disk_usages(configs: &Configs) -> io::Result<()> {
     let mut child_a = Command::new("du")
         .args(["--summarize", "--bytes", &configs.source])
         .spawn()?;
 
     let mut child_b = Command::new("ssh")
-        .arg(format!(
-            "{}@{}",
-            &configs.storage.hot.user, &configs.storage.hot.host
-        ))
+        .arg(get_ssh_dest_hot(&configs))
         .arg(format!("du --summarize --bytes {}", &configs.source))
         .spawn()?;
 
