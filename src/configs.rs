@@ -1,4 +1,3 @@
-use serde::de::Error as DeserializationError;
 use serde::{Deserialize, Deserializer};
 
 use crate::data_directory;
@@ -14,7 +13,7 @@ where
     let value = String::deserialize(deserializer)?;
 
     if value.is_empty() {
-        Err(DeserializationError::custom("String cannot be empty"))
+        Err(serde::de::Error::custom("String cannot be empty"))
     } else {
         Ok(value)
     }
@@ -62,22 +61,9 @@ fn get_config_file_path() -> Result<PathBuf, BackupError> {
     Ok(program_dir.join("config.toml"))
 }
 
-fn read_config_file_to_toml_string(config_file: &PathBuf) -> Result<String, BackupError> {
-    match fs::read_to_string(config_file) {
-        Ok(contents) => Ok(contents),
-        Err(e) => Err(BackupError::ConfigurationError(e.to_string())),
-    }
-}
-
-fn parse_toml_string(toml_str: &str) -> Result<Configs, BackupError> {
-    match toml::from_str::<Configs>(toml_str) {
-        Ok(config) => Ok(config),
-        Err(e) => Err(BackupError::ConfigurationError(e.to_string())),
-    }
-}
-
 pub fn load_configs() -> Result<Configs, BackupError> {
     let config_file = get_config_file_path()?;
-    let toml_str = read_config_file_to_toml_string(&config_file)?;
-    parse_toml_string(&toml_str)
+    let toml_str = fs::read_to_string(&config_file)?;
+    let configs = toml::from_str::<Configs>(&toml_str)?;
+    Ok(configs)
 }
