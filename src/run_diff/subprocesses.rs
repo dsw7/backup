@@ -53,14 +53,20 @@ pub fn get_disk_usages(configs: &Configs) -> Result<Vec<Usage>, BackupError> {
 
     let proc_hot_backup = Command::new("ssh")
         .arg(get_ssh_dest_hot(configs))
-        .arg(format!("du --summarize --bytes {}", &configs.source))
+        .arg(format!(
+            "du --summarize --bytes {}",
+            &configs.storage.hot.destination
+        ))
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()?;
 
     let proc_cold_backup = Command::new("ssh")
         .arg(get_ssh_dest_cold(configs))
-        .arg(format!("du --summarize --bytes {}", &configs.source))
+        .arg(format!(
+            "du --summarize --bytes {}",
+            &configs.storage.cold.destination
+        ))
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()?;
