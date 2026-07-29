@@ -19,15 +19,6 @@ fn unpack_stdout(stdout: &str) -> Result<(usize, String), std::num::ParseIntErro
     Ok((bytes, path))
 }
 
-fn get_usage_bytes(parts: &Vec<&str>) -> Result<usize, std::num::ParseIntError> {
-    let bytes = match parts.first() {
-        Some(val) => val.parse::<usize>()?,
-        None => 0,
-    };
-
-    Ok(bytes)
-}
-
 fn bytes_to_human_readable(usage_bytes: usize) -> String {
     let units = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"];
     let mut size = usage_bytes as f64;
@@ -44,14 +35,6 @@ fn bytes_to_human_readable(usage_bytes: usize) -> String {
         format!("{:.1}{}", size, units[unit_index])
     }
 }
-
-fn get_path(parts: &Vec<&str>) -> String {
-    match parts.get(1) {
-        Some(val) => val.to_string(),
-        None => String::from("-"),
-    }
-}
-
 
 fn display_usages(usages: &Vec<Usage>) -> Result<(), BackupError> {
     println!(
@@ -100,21 +83,6 @@ pub fn run_diff_procedure(configs: &Configs) -> Result<(), BackupError> {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn test_get_usage_bytes() {
-        assert_eq!(super::get_usage_bytes(&vec![]), Ok(0));
-        assert_eq!(super::get_usage_bytes(&vec!["123", "/tmp/foo"]), Ok(123));
-        assert!(matches!(
-            super::get_usage_bytes(&vec!["abc", "/tmp/foo"]),
-            Err(_)
-        ));
-    }
-
-    #[test]
-    fn test_get_path() {
-        assert_eq!(super::get_path(&vec![]), "-");
-        assert_eq!(super::get_path(&vec!["123", "/tmp/foo"]), "/tmp/foo");
-    }
 
     #[test]
     fn test_bytes_to_human_readable() {
