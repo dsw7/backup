@@ -6,8 +6,21 @@ use crate::errors::BackupError;
 use std::fs;
 use std::path::PathBuf;
 
+fn check_not_empty<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    if s.is_empty() {
+        Err(serde::de::Error::custom("String cannot be empty"))
+    } else {
+        Ok(s)
+    }
+}
+
 #[derive(Deserialize, Debug)]
 pub struct Configs {
+    #[serde(deserialize_with = "check_not_empty")]
     pub source: String,
     pub storage: Storage,
 }
@@ -20,15 +33,25 @@ pub struct Storage {
 
 #[derive(Deserialize, Debug)]
 pub struct Hot {
+    #[serde(deserialize_with = "check_not_empty")]
     pub user: String,
+
+    #[serde(deserialize_with = "check_not_empty")]
     pub host: String,
+
+    #[serde(deserialize_with = "check_not_empty")]
     pub destination: String,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct Cold {
+    #[serde(deserialize_with = "check_not_empty")]
     pub user: String,
+
+    #[serde(deserialize_with = "check_not_empty")]
     pub host: String,
+
+    #[serde(deserialize_with = "check_not_empty")]
     pub destination: String,
 }
 
