@@ -1,12 +1,12 @@
 use std::env;
-use std::io::{self, Error, ErrorKind};
+use std::io;
 use std::path::PathBuf;
 
 fn get_home_dir() -> io::Result<PathBuf> {
     match env::home_dir() {
         Some(path) => Ok(path),
-        None => Err(Error::new(
-            ErrorKind::NotFound,
+        None => Err(io::Error::new(
+            io::ErrorKind::NotFound,
             "Couldn't get home directory",
         )),
     }
@@ -19,8 +19,8 @@ pub fn get_data_dir() -> io::Result<PathBuf> {
     if program_dir.exists() {
         Ok(program_dir)
     } else {
-        Err(Error::new(
-            ErrorKind::NotFound,
+        Err(io::Error::new(
+            io::ErrorKind::NotFound,
             "Program data directory does not exist",
         ))
     }
