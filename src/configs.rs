@@ -1,4 +1,5 @@
-use serde::Deserialize;
+use serde::de::Error as DeserializationError;
+use serde::{Deserialize, Deserializer};
 
 use crate::data_directory;
 use crate::errors::BackupError;
@@ -8,13 +9,14 @@ use std::path::PathBuf;
 
 fn check_not_empty<'de, D>(deserializer: D) -> Result<String, D::Error>
 where
-    D: serde::Deserializer<'de>,
+    D: Deserializer<'de>,
 {
-    let s = String::deserialize(deserializer)?;
-    if s.is_empty() {
-        Err(serde::de::Error::custom("String cannot be empty"))
+    let value = String::deserialize(deserializer)?;
+
+    if value.is_empty() {
+        Err(DeserializationError::custom("String cannot be empty"))
     } else {
-        Ok(s)
+        Ok(value)
     }
 }
 
