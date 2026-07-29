@@ -3,6 +3,22 @@ use crate::errors::BackupError;
 
 use super::subprocesses::{Usage, get_disk_usages};
 
+fn unpack_stdout(stdout: &str) -> Result<(usize, String), std::num::ParseIntError> {
+    let parts: Vec<&str> = stdout.split_whitespace().collect();
+
+    let bytes = match parts.first() {
+        Some(val) => val.parse::<usize>()?,
+        None => 0,
+    };
+
+    let path = match parts.get(1) {
+        Some(val) => val.to_string(),
+        None => String::from("-"),
+    };
+
+    Ok((bytes, path))
+}
+
 fn get_usage_bytes(parts: &Vec<&str>) -> Result<usize, std::num::ParseIntError> {
     let bytes = match parts.first() {
         Some(val) => val.parse::<usize>()?,
@@ -36,6 +52,7 @@ fn get_path(parts: &Vec<&str>) -> String {
     }
 }
 
+
 fn display_usages(usages: &Vec<Usage>) -> Result<(), BackupError> {
     println!(
         "{:<20} {:<25} {:<16} Usage",
@@ -48,9 +65,7 @@ fn display_usages(usages: &Vec<Usage>) -> Result<(), BackupError> {
 
     for usage in usages {
         if let Usage::Success { host, stdout } = usage {
-            let parts: Vec<&str> = stdout.split_whitespace().collect();
-            let path = get_path(&parts);
-            let usage_bytes = get_usage_bytes(&parts)?;
+            let (usage_bytes, path) = unpack_stdout(&stdout)?;
             let usage_bytes_human_readable = bytes_to_human_readable(usage_bytes);
             println!("{host:<20} {path:<25} {usage_bytes:<16} {usage_bytes_human_readable}");
         }
