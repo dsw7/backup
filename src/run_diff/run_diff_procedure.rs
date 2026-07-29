@@ -48,7 +48,7 @@ fn display_usages(usages: &Vec<Usage>) -> Result<(), BackupError> {
 
     for usage in usages {
         if let Usage::Success { host, stdout } = usage {
-            let (usage_bytes, path) = unpack_stdout(&stdout)?;
+            let (usage_bytes, path) = unpack_stdout(stdout)?;
             let usage_bytes_human_readable = bytes_to_human_readable(usage_bytes);
             println!("{host:<20} {path:<25} {usage_bytes:<16} {usage_bytes_human_readable}");
         }
@@ -83,6 +83,30 @@ pub fn run_diff_procedure(configs: &Configs) -> Result<(), BackupError> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn test_unpack_stdout_valid_cases() {
+        assert_eq!(
+            super::unpack_stdout("16411   /tmp/bar/"),
+            Ok((16411, "/tmp/bar/".into()))
+        );
+        assert_eq!(
+            super::unpack_stdout("   16411   /tmp/bar/"),
+            Ok((16411, "/tmp/bar/".into()))
+        );
+        assert_eq!(
+            super::unpack_stdout("16411   /tmp/bar/   "),
+            Ok((16411, "/tmp/bar/".into()))
+        );
+        assert_eq!(super::unpack_stdout("16411 "), Ok((16411, "-".into())));
+        assert_eq!(super::unpack_stdout("16411"), Ok((16411, "-".into())));
+        assert_eq!(super::unpack_stdout(" "), Ok((0, "-".into())));
+        assert_eq!(super::unpack_stdout(""), Ok((0, "-".into())));
+    }
+
+    #[test]
+    fn test_unpack_stdout_not_parsable() {
+        assert!(matches!(super::unpack_stdout("?????   /tmp/bar/"), Err(_)));
+    }
 
     #[test]
     fn test_bytes_to_human_readable() {
