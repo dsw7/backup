@@ -4,7 +4,7 @@ use crate::errors::BackupError;
 use super::subprocesses::{Usage, get_disk_usages};
 
 fn get_usage_bytes(parts: &Vec<&str>) -> Result<usize, std::num::ParseIntError> {
-    let bytes = match parts.get(0) {
+    let bytes = match parts.first() {
         Some(val) => val.parse::<usize>()?,
         None => 0,
     };
@@ -31,7 +31,7 @@ fn display_usages(usages: &Vec<Usage>) -> Result<(), BackupError> {
             let parts: Vec<&str> = stdout.split_whitespace().collect();
             let path = get_path(&parts);
             let usage_bytes = get_usage_bytes(&parts)?;
-            println!("{:<20} {:<25} {:<15}", host, path, usage_bytes);
+            println!("{host:<20} {path:<25} {usage_bytes:<15}");
         }
     }
 
@@ -47,13 +47,13 @@ fn display_failed_usages(usages: &Vec<Usage>) {
 
     for usage in usages {
         if let Usage::Failure { host, stderr } = usage {
-            println!("{:<20} {:<25}", host, stderr);
+            println!("{host:<20} {stderr:<25}");
         }
     }
 }
 
 pub fn run_diff_procedure(configs: &Configs) -> Result<(), BackupError> {
-    let usages = get_disk_usages(&configs)?;
+    let usages = get_disk_usages(configs)?;
 
     display_usages(&usages)?;
     println!();

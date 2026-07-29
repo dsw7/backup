@@ -34,7 +34,7 @@ pub struct Cold {
 
 fn get_config_file_path() -> Result<PathBuf, BackupError> {
     let program_dir = data_directory::get_data_dir()?;
-    Ok(PathBuf::from(program_dir).join("config.toml"))
+    Ok(program_dir.join("config.toml"))
 }
 
 fn read_config_file_to_toml_string(config_file: &PathBuf) -> Result<String, BackupError> {
@@ -44,7 +44,7 @@ fn read_config_file_to_toml_string(config_file: &PathBuf) -> Result<String, Back
     }
 }
 
-fn parse_toml_string(toml_str: &String) -> Result<Configs, BackupError> {
+fn parse_toml_string(toml_str: &str) -> Result<Configs, BackupError> {
     match toml::from_str::<Configs>(toml_str) {
         Ok(config) => Ok(config),
         Err(e) => Err(BackupError::ConfigurationError(e.to_string())),

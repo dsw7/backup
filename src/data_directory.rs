@@ -14,7 +14,7 @@ fn get_home_dir() -> io::Result<PathBuf> {
 
 pub fn get_data_dir() -> io::Result<PathBuf> {
     let home_dir = get_home_dir()?;
-    let program_dir = PathBuf::from(home_dir).join(".backup");
+    let program_dir = home_dir.join(".backup");
 
     if program_dir.exists() {
         Ok(program_dir)

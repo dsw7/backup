@@ -1,13 +1,13 @@
 use crate::errors::BackupError;
 
-use std::path::PathBuf;
+use std::path::Path;
 use std::process::Command;
 
 fn append_slash_to_src(src: &String) -> String {
     if src.ends_with('/') {
         String::from(src)
     } else {
-        String::from(format!("{src}/"))
+        format!("{src}/")
     }
 }
 
@@ -24,14 +24,14 @@ pub fn run_rsync(
     user: &String,
     host: &String,
     dst: &String,
-    log_file: &PathBuf,
+    log_file: &Path,
 ) -> Result<(), BackupError> {
     let status = Command::new("rsync")
         .arg("-av")
         .arg("--delete")
         .arg(format!("--log-file={}", log_file.display()))
-        .arg(append_slash_to_src(&src))
-        .arg(format!("{user}@{host}:{}", remove_slash_from_dst(&dst)))
+        .arg(append_slash_to_src(src))
+        .arg(format!("{user}@{host}:{}", remove_slash_from_dst(dst)))
         .status()?;
 
     if !status.success() {
@@ -51,8 +51,8 @@ pub fn run_rsync_dry_run(
         .arg("-av")
         .arg("--delete")
         .arg("--dry-run")
-        .arg(append_slash_to_src(&src))
-        .arg(format!("{user}@{host}:{}", remove_slash_from_dst(&dst)))
+        .arg(append_slash_to_src(src))
+        .arg(format!("{user}@{host}:{}", remove_slash_from_dst(dst)))
         .status()?;
 
     if !status.success() {

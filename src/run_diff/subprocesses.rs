@@ -34,12 +34,12 @@ fn unpack_output(host: &String, output: &Output) -> Usage {
     if output.status.success() {
         Usage::Success {
             host: String::from(host),
-            stdout: extract_stdout(&output),
+            stdout: extract_stdout(output),
         }
     } else {
         Usage::Failure {
             host: String::from(host),
-            stderr: extract_stderr(&output),
+            stderr: extract_stderr(output),
         }
     }
 }
@@ -52,14 +52,14 @@ pub fn get_disk_usages(configs: &Configs) -> Result<Vec<Usage>, BackupError> {
         .spawn()?;
 
     let proc_hot_backup = Command::new("ssh")
-        .arg(get_ssh_dest_hot(&configs))
+        .arg(get_ssh_dest_hot(configs))
         .arg(format!("du --summarize --bytes {}", &configs.source))
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()?;
 
     let proc_cold_backup = Command::new("ssh")
-        .arg(get_ssh_dest_cold(&configs))
+        .arg(get_ssh_dest_cold(configs))
         .arg(format!("du --summarize --bytes {}", &configs.source))
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
