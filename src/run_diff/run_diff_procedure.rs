@@ -12,6 +12,19 @@ fn get_usage_bytes(parts: &Vec<&str>) -> Result<usize, std::num::ParseIntError> 
     Ok(bytes)
 }
 
+fn bytes_to_human_readable(usage_bytes: usize) -> String {
+    let units = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"];
+    let mut size = usage_bytes as f64;
+    let mut unit_index = 0;
+
+    while size >= 1024.0 && unit_index < units.len() - 1 {
+        size /= 1024.0;
+        unit_index += 1;
+    }
+
+    format!("{:.1}{}", size, units[unit_index])
+}
+
 fn get_path(parts: &Vec<&str>) -> String {
     match parts.get(1) {
         Some(val) => val.to_string(),
@@ -20,10 +33,13 @@ fn get_path(parts: &Vec<&str>) -> String {
 }
 
 fn display_usages(usages: &Vec<Usage>) -> Result<(), BackupError> {
-    println!("{:<20} {:<25} {:<15}", "Host", "Path", "Usage (bytes)");
     println!(
-        "{:<20} {:<25} {:<15}",
-        "-------------------", "------------------------", "---------------"
+        "{:<20} {:<25} {:<16} {}",
+        "Host", "Path", "Usage (bytes)", "Usage"
+    );
+    println!(
+        "{:<20} {:<25} {:<16} {}",
+        "-------------------", "------------------------", "---------------", "-------"
     );
 
     for usage in usages {
@@ -31,7 +47,8 @@ fn display_usages(usages: &Vec<Usage>) -> Result<(), BackupError> {
             let parts: Vec<&str> = stdout.split_whitespace().collect();
             let path = get_path(&parts);
             let usage_bytes = get_usage_bytes(&parts)?;
-            println!("{host:<20} {path:<25} {usage_bytes:<15}");
+            let usage_bytes_human_readable = bytes_to_human_readable(usage_bytes);
+            println!("{host:<20} {path:<25} {usage_bytes:<16} {usage_bytes_human_readable}");
         }
     }
 
