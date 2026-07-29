@@ -83,38 +83,40 @@ pub fn run_diff_procedure(configs: &Configs) -> Result<(), BackupError> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_unpack_stdout_valid_cases() {
         assert_eq!(
-            super::unpack_stdout("16411   /tmp/bar/"),
+            unpack_stdout("16411   /tmp/bar/"),
             Ok((16411, "/tmp/bar/".into()))
         );
         assert_eq!(
-            super::unpack_stdout("   16411   /tmp/bar/"),
+            unpack_stdout("   16411   /tmp/bar/"),
             Ok((16411, "/tmp/bar/".into()))
         );
         assert_eq!(
-            super::unpack_stdout("16411   /tmp/bar/   "),
+            unpack_stdout("16411   /tmp/bar/   "),
             Ok((16411, "/tmp/bar/".into()))
         );
-        assert_eq!(super::unpack_stdout("16411 "), Ok((16411, "-".into())));
-        assert_eq!(super::unpack_stdout("16411"), Ok((16411, "-".into())));
-        assert_eq!(super::unpack_stdout(" "), Ok((0, "-".into())));
-        assert_eq!(super::unpack_stdout(""), Ok((0, "-".into())));
+        assert_eq!(unpack_stdout("16411 "), Ok((16411, "-".into())));
+        assert_eq!(unpack_stdout("16411"), Ok((16411, "-".into())));
+        assert_eq!(unpack_stdout(" "), Ok((0, "-".into())));
+        assert_eq!(unpack_stdout(""), Ok((0, "-".into())));
     }
 
     #[test]
     fn test_unpack_stdout_not_parsable() {
-        assert!(matches!(super::unpack_stdout("?????   /tmp/bar/"), Err(_)));
+        assert!(matches!(unpack_stdout("?????   /tmp/bar/"), Err(_)));
     }
 
     #[test]
     fn test_bytes_to_human_readable() {
-        assert_eq!(super::bytes_to_human_readable(0), "0B");
-        assert_eq!(super::bytes_to_human_readable(512), "512B");
-        assert_eq!(super::bytes_to_human_readable(16411), "16.0K");
-        assert_eq!(super::bytes_to_human_readable(16900), "16.5K");
-        assert_eq!(super::bytes_to_human_readable(2174555), "2.1M");
-        assert_eq!(super::bytes_to_human_readable(107916553087), "100.5G");
+        assert_eq!(bytes_to_human_readable(0), "0B");
+        assert_eq!(bytes_to_human_readable(512), "512B");
+        assert_eq!(bytes_to_human_readable(16411), "16.0K");
+        assert_eq!(bytes_to_human_readable(16900), "16.5K");
+        assert_eq!(bytes_to_human_readable(2174555), "2.1M");
+        assert_eq!(bytes_to_human_readable(107916553087), "100.5G");
     }
 }
