@@ -22,7 +22,11 @@ fn bytes_to_human_readable(usage_bytes: usize) -> String {
         unit_index += 1;
     }
 
-    format!("{:.1}{}", size, units[unit_index])
+    if usage_bytes < 1024 {
+        format!("{}{}", usage_bytes, units[unit_index])
+    } else {
+        format!("{:.1}{}", size, units[unit_index])
+    }
 }
 
 fn get_path(parts: &Vec<&str>) -> String {
