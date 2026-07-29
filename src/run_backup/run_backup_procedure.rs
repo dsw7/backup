@@ -67,7 +67,7 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
 
     let option = read_option_from_stdin()?;
 
-    if option < 1 || option > 4 {
+    if !(1..=4).contains(&option) {
         println!("Backup was manually aborted");
         return Ok(());
     }

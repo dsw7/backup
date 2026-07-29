@@ -34,12 +34,12 @@ fn get_path(parts: &Vec<&str>) -> String {
 
 fn display_usages(usages: &Vec<Usage>) -> Result<(), BackupError> {
     println!(
-        "{:<20} {:<25} {:<16} {}",
-        "Host", "Path", "Usage (bytes)", "Usage"
+        "{:<20} {:<25} {:<16} Usage",
+        "Host", "Path", "Usage (bytes)"
     );
     println!(
-        "{:<20} {:<25} {:<16} {}",
-        "-------------------", "------------------------", "---------------", "-------"
+        "{:<20} {:<25} {:<16} -------",
+        "-------------------", "------------------------", "---------------"
     );
 
     for usage in usages {
