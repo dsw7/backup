@@ -47,7 +47,7 @@ pub fn run_rsync_dry_run(
     host: &String,
     dst: &String,
 ) -> Result<(), BackupError> {
-    let status = Command::new("rsync2")
+    let status = Command::new("rsync")
         .arg("-av")
         .arg("--delete")
         .arg("--dry-run")
