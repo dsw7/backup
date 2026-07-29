@@ -87,6 +87,7 @@ pub fn run_diff_procedure(configs: &Configs) -> Result<(), BackupError> {
 mod tests {
     #[test]
     fn test_bytes_to_human_readable() {
+        assert_eq!(super::bytes_to_human_readable(0), "0B");
         assert_eq!(super::bytes_to_human_readable(512), "512B");
         assert_eq!(super::bytes_to_human_readable(16411), "16.0K");
         assert_eq!(super::bytes_to_human_readable(16900), "16.5K");
