@@ -86,6 +86,22 @@ pub fn run_diff_procedure(configs: &Configs) -> Result<(), BackupError> {
 #[cfg(test)]
 mod tests {
     #[test]
+    fn test_get_usage_bytes() {
+        assert_eq!(super::get_usage_bytes(&vec![]), Ok(0));
+        assert_eq!(super::get_usage_bytes(&vec!["123", "/tmp/foo"]), Ok(123));
+        assert!(matches!(
+            super::get_usage_bytes(&vec!["abc", "/tmp/foo"]),
+            Err(_)
+        ));
+    }
+
+    #[test]
+    fn test_get_path() {
+        assert_eq!(super::get_path(&vec![]), "-");
+        assert_eq!(super::get_path(&vec!["123", "/tmp/foo"]), "/tmp/foo");
+    }
+
+    #[test]
     fn test_bytes_to_human_readable() {
         assert_eq!(super::bytes_to_human_readable(0), "0B");
         assert_eq!(super::bytes_to_human_readable(512), "512B");
