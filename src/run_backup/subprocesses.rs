@@ -97,22 +97,3 @@ pub fn run_rsync(
 
     Ok(())
 }
-
-pub fn run_rsync_dry_run(
-    src: &str,
-    user: &String,
-    host: &String,
-    dst: &String,
-) -> Result<(), BackupError> {
-    let dst = format!("{user}@{host}:{dst}");
-
-    let status = Command::new("rsync")
-        .args(["-av", "--delete", "--dry-run", src, &dst])
-        .status()?;
-
-    if !status.success() {
-        eprintln!("Synchronization failed");
-    }
-
-    Ok(())
-}

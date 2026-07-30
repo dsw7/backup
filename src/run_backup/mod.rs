@@ -1,3 +1,4 @@
+mod rsync_dry_run;
 mod subprocesses;
 
 pub mod run_backup_procedure;

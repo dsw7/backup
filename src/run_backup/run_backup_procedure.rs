@@ -2,6 +2,7 @@ use crate::configs::Configs;
 use crate::data_directory::get_data_dir;
 use crate::errors::BackupError;
 
+use super::rsync_dry_run;
 use super::subprocesses;
 
 use std::io::{self, Write};
@@ -98,7 +99,7 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
     let dst = remove_slash_from_dst(dst);
 
     if is_dry_run {
-        subprocesses::run_rsync_dry_run(&src, user, host, &dst)
+        rsync_dry_run::run_rsync_subprocess(&src, user, host, &dst)
     } else {
         let log_file = select_log_file(sync_to_hot)?;
         subprocesses::run_rsync(&src, user, host, &dst, &log_file)
