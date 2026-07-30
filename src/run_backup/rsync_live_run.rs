@@ -1,3 +1,4 @@
+use tracing_subscriber::{fmt, Registry};
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::prelude::*;
 
@@ -26,36 +27,10 @@ fn worker_log_stderr(stderr: ChildStderr) {
     }
 }
 
-//pub fn run_rsync(
-pub fn run_rsync_subprocess(
-    src: &str,
-    user: &String,
-    host: &String,
-    dst: &String,
-    log_file: &Path,
-) -> Result<(), BackupError> {
-    let dst = format!("{user}@{host}:{dst}");
-
-    let file_appender = tracing_appender::rolling::daily("/tmp", "app.log");
-
-    let (non_blocking_file, _guard) = tracing_appender::non_blocking(file_appender);
-
-    let stdout_layer = tracing_subscriber::fmt::layer()
-        .with_writer(std::io::stdout)
-        .with_target(false)
-        .with_filter(LevelFilter::DEBUG);
-
-    let file_layer = tracing_subscriber::fmt::layer()
-        .with_writer(non_blocking_file)
-        .with_target(false)
-        .with_ansi(false)
-        .with_filter(LevelFilter::DEBUG);
-
-    tracing_subscriber::Registry::default()
-        .with(stdout_layer)
-        .with(file_layer)
-        .init();
+pub fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> Result<(), BackupError> {
     tracing::info!("Starting data synchronization");
+
+    let dst = format!("{user}@{host}:{dst}");
 
     let mut child = Command::new("rsync")
         .args(["-av", "--delete", src, &dst])
@@ -91,10 +66,40 @@ pub fn run_rsync_subprocess(
     let status = child.wait()?;
 
     if status.success() {
-        tracing::info!("Synchronization succeeded");
+        tracing::info!("Synchronization succeeded\n");
     } else {
-        tracing::error!("Synchronization failed");
+        tracing::error!("Synchronization failed\n");
     }
 
     Ok(())
+}
+
+pub fn run_rsync_subprocess(
+    src: &str,
+    user: &String,
+    host: &String,
+    dst: &String,
+    log_file: &Path,
+) -> Result<(), BackupError> {
+    let stdout_layer = fmt::layer()
+        .with_writer(io::stdout)
+        .with_target(false)
+        .with_filter(LevelFilter::DEBUG);
+
+    let file_appender = tracing_appender::rolling::daily("/tmp", "app.log");
+    let (non_blocking_file, _guard) = tracing_appender::non_blocking(file_appender);
+    // every scope where logging takes place (this + children) must have access to _guard
+
+    let file_layer = fmt::layer()
+        .with_writer(non_blocking_file)
+        .with_target(false)
+        .with_ansi(false)
+        .with_filter(LevelFilter::DEBUG);
+
+    Registry::default()
+        .with(stdout_layer)
+        .with(file_layer)
+        .init();
+
+    run_rsync(src, user, host, dst)
 }
