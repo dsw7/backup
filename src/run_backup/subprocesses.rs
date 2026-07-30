@@ -1,7 +1,15 @@
+use tracing::Level;
+
 use crate::errors::BackupError;
 
 use std::path::Path;
 use std::process::Command;
+
+fn init_logger() {
+    tracing_subscriber::fmt()
+        .with_max_level(Level::DEBUG)
+        .init();
+}
 
 fn append_slash_to_src(src: &String) -> String {
     if src.ends_with('/') {
@@ -26,6 +34,9 @@ pub fn run_rsync(
     dst: &String,
     log_file: &Path,
 ) -> Result<(), BackupError> {
+    init_logger();
+    tracing::info!("Starting data synchronization");
+
     let status = Command::new("rsync")
         .arg("-av")
         .arg("--delete")
@@ -34,8 +45,10 @@ pub fn run_rsync(
         .arg(format!("{user}@{host}:{}", remove_slash_from_dst(dst)))
         .status()?;
 
-    if !status.success() {
-        eprintln!("Synchronization failed");
+    if status.success() {
+        tracing::error!("Synchronization failed");
+    } else {
+        tracing::info!("Synchronization succeeded");
     }
 
     Ok(())
