@@ -95,3 +95,12 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
         subprocesses::run_rsync(&src, user, host, destination, &log_file)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_append_slash_to_src() {
+        assert_eq!(super::append_slash_to_src(&"/tmp/bar".into()), "/tmp/bar/");
+        assert_eq!(super::append_slash_to_src(&"/tmp/bar/".into()), "/tmp/bar/");
+    }
+}
