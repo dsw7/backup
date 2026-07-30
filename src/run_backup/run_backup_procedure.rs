@@ -15,12 +15,7 @@ fn read_option_from_stdin() -> io::Result<i32> {
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
 
-    let option = match i32::from_str(input.trim()) {
-        Ok(val) => val,
-        Err(_) => 0,
-    };
-
-    Ok(option)
+    Ok(i32::from_str(input.trim()).unwrap_or_default())
 }
 
 fn append_slash_to_src(src: &String) -> String {
