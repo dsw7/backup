@@ -2,8 +2,9 @@ use tracing::Level;
 
 use crate::errors::BackupError;
 
+use std::io::{BufRead, BufReader};
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 fn init_logger() {
     tracing_subscriber::fmt()
@@ -37,13 +38,26 @@ pub fn run_rsync(
     init_logger();
     tracing::info!("Starting data synchronization");
 
-    let status = Command::new("rsync")
+    let mut child = Command::new("rsync")
         .arg("-av")
         .arg("--delete")
         .arg(format!("--log-file={}", log_file.display()))
         .arg(append_slash_to_src(src))
         .arg(format!("{user}@{host}:{}", remove_slash_from_dst(dst)))
-        .status()?;
+        .stderr(Stdio::piped())
+        .spawn()?;
+
+    if let Some(stderr) = child.stderr.take() {
+        let reader = BufReader::new(stderr);
+        for line in reader.lines() {
+            match line {
+                Ok(text) => tracing::error!("{text}"),
+                Err(e) => tracing::error!("Error reading line: {}", e),
+            }
+        }
+    }
+
+    let status = child.wait()?;
 
     if status.success() {
         tracing::error!("Synchronization failed");
