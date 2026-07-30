@@ -81,13 +81,15 @@ pub fn run_rsync(
     let handle_stderr = thread::spawn(move || worker_log_stderr(stderr));
 
     if handle_stdout.join().is_err() {
-        let io_err = io::Error::other("The stdout thread failed");
-        return Err(BackupError::IO { source: io_err });
+        return Err(BackupError::IO {
+            source: io::Error::other("The stdout thread failed"),
+        });
     }
 
     if handle_stderr.join().is_err() {
-        let io_err = io::Error::other("The stderr thread failed");
-        return Err(BackupError::IO { source: io_err });
+        return Err(BackupError::IO {
+            source: io::Error::other("The stderr thread failed"),
+        });
     }
 
     let status = child.wait()?;
