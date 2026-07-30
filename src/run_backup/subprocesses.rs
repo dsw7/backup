@@ -54,15 +54,14 @@ pub fn run_rsync(
     dst: &String,
     log_file: &Path,
 ) -> Result<(), BackupError> {
+    let src = append_slash_to_src(src);
+    let dst = format!("{user}@{host}:{}", remove_slash_from_dst(dst));
+
     init_logger();
     tracing::info!("Starting data synchronization");
 
     let mut child = Command::new("rsync")
-        .arg("-av")
-        .arg("--delete")
-        .arg(format!("--log-file={}", log_file.display()))
-        .arg(append_slash_to_src(src))
-        .arg(format!("{user}@{host}:{}", remove_slash_from_dst(dst)))
+        .args(["-av", "--delete", &src, &dst])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()?;
