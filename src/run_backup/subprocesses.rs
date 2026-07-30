@@ -5,6 +5,7 @@ use crate::errors::BackupError;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::process::{Command, Stdio};
+use std::thread;
 
 fn init_logger() {
     tracing_subscriber::fmt()
@@ -44,25 +45,40 @@ pub fn run_rsync(
         .arg(format!("--log-file={}", log_file.display()))
         .arg(append_slash_to_src(src))
         .arg(format!("{user}@{host}:{}", remove_slash_from_dst(dst)))
+        .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()?;
 
-    if let Some(stderr) = child.stderr.take() {
-        let reader = BufReader::new(stderr);
-        for line in reader.lines() {
+    let stdout = child.stdout.take().expect("Failed to open stdout");
+    let stderr = child.stderr.take().expect("Failed to open stderr");
+
+    let handle_stdout = thread::spawn(move || {
+        for line in BufReader::new(stdout).lines() {
+            match line {
+                Ok(text) => tracing::info!("{text}"),
+                Err(e) => tracing::error!("Error reading line: {}", e),
+            }
+        }
+    });
+
+    let handle_stderr = thread::spawn(move || {
+        for line in BufReader::new(stderr).lines() {
             match line {
                 Ok(text) => tracing::error!("{text}"),
                 Err(e) => tracing::error!("Error reading line: {}", e),
             }
         }
-    }
+    });
+
+    handle_stdout.join().unwrap();
+    handle_stderr.join().unwrap();
 
     let status = child.wait()?;
 
     if status.success() {
-        tracing::error!("Synchronization failed");
-    } else {
         tracing::info!("Synchronization succeeded");
+    } else {
+        tracing::error!("Synchronization failed");
     }
 
     Ok(())
