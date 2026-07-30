@@ -86,7 +86,7 @@ pub fn run_rsync_subprocess(
         .with_target(false)
         .with_filter(LevelFilter::DEBUG);
 
-    let file_appender = tracing_appender::rolling::daily("/tmp", "app.log");
+    let file_appender = tracing_appender::rolling::never("/tmp", "app.log");
     let (non_blocking_file, _guard) = tracing_appender::non_blocking(file_appender);
     // every scope where logging takes place (this + children) must have access to _guard
 
