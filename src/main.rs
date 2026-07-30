@@ -14,7 +14,13 @@ use run_diff::run_diff_procedure;
 use std::process::ExitCode;
 
 #[derive(Parser, Debug)]
-#[command(name = "backup", version, about = "DSW backup and recovery system")]
+#[command(
+    name = "backup",
+    version,
+    about = "DSW backup and recovery system",
+    after_help = "See https://github.com/dsw7/backup for more information
+See the rsync(1) manpages for a more general backup and recovery command"
+)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
