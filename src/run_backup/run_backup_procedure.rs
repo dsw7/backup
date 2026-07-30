@@ -23,6 +23,14 @@ fn read_option_from_stdin() -> io::Result<i32> {
     Ok(option)
 }
 
+fn append_slash_to_src(src: &String) -> String {
+    if src.ends_with('/') {
+        String::from(src)
+    } else {
+        format!("{src}/")
+    }
+}
+
 fn select_user(sync_to_hot: bool, configs: &Configs) -> &String {
     if sync_to_hot {
         &configs.storage.hot.user
@@ -75,14 +83,15 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
     let sync_to_hot = matches!(option, 1 | 2);
     let is_dry_run = matches!(option, 2 | 4);
 
+    let src = append_slash_to_src(&configs.source);
     let user = select_user(sync_to_hot, configs);
     let host = select_host(sync_to_hot, configs);
     let destination = select_destination(sync_to_hot, configs);
 
     if is_dry_run {
-        subprocesses::run_rsync_dry_run(&configs.source, user, host, destination)
+        subprocesses::run_rsync_dry_run(&src, user, host, destination)
     } else {
         let log_file = select_log_file(sync_to_hot)?;
-        subprocesses::run_rsync(&configs.source, user, host, destination, &log_file)
+        subprocesses::run_rsync(&src, user, host, destination, &log_file)
     }
 }

@@ -1,4 +1,5 @@
-use tracing::Level;
+use tracing_subscriber::filter::LevelFilter;
+use tracing_subscriber::prelude::*;
 
 use crate::errors::BackupError;
 
@@ -6,21 +7,6 @@ use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 use std::process::{ChildStderr, ChildStdout, Command, Stdio};
 use std::thread;
-
-fn init_logger() {
-    tracing_subscriber::fmt()
-        .with_max_level(Level::DEBUG)
-        .with_target(false)
-        .init();
-}
-
-fn append_slash_to_src(src: &String) -> String {
-    if src.ends_with('/') {
-        String::from(src)
-    } else {
-        format!("{src}/")
-    }
-}
 
 fn remove_slash_from_dst(dst: &String) -> String {
     if dst.ends_with('/') {
@@ -55,14 +41,31 @@ pub fn run_rsync(
     dst: &String,
     log_file: &Path,
 ) -> Result<(), BackupError> {
-    let src = append_slash_to_src(src);
     let dst = format!("{user}@{host}:{}", remove_slash_from_dst(dst));
 
-    init_logger();
+    let file_appender = tracing_appender::rolling::daily("/tmp", "app.log");
+
+    let (non_blocking_file, _guard) = tracing_appender::non_blocking(file_appender);
+
+    let stdout_layer = tracing_subscriber::fmt::layer()
+        .with_writer(std::io::stdout)
+        .with_target(false)
+        .with_filter(LevelFilter::DEBUG);
+
+    let file_layer = tracing_subscriber::fmt::layer()
+        .with_writer(non_blocking_file)
+        .with_target(false)
+        .with_ansi(false)
+        .with_filter(LevelFilter::DEBUG);
+
+    tracing_subscriber::Registry::default()
+        .with(stdout_layer)
+        .with(file_layer)
+        .init();
     tracing::info!("Starting data synchronization");
 
     let mut child = Command::new("rsync")
-        .args(["-av", "--delete", &src, &dst])
+        .args(["-av", "--delete", src, &dst])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()?;
@@ -109,11 +112,10 @@ pub fn run_rsync_dry_run(
     host: &String,
     dst: &String,
 ) -> Result<(), BackupError> {
-    let src = append_slash_to_src(src);
     let dst = format!("{user}@{host}:{}", remove_slash_from_dst(dst));
 
     let status = Command::new("rsync")
-        .args(["-av", "--delete", "--dry-run", &src, &dst])
+        .args(["-av", "--delete", "--dry-run", src, &dst])
         .status()?;
 
     if !status.success() {
