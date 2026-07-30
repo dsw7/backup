@@ -4,7 +4,7 @@ use crate::errors::BackupError;
 
 use std::io::{BufRead, BufReader};
 use std::path::Path;
-use std::process::{Command, Stdio};
+use std::process::{ChildStderr, ChildStdout, Command, Stdio};
 use std::thread;
 
 fn init_logger() {
@@ -26,6 +26,24 @@ fn remove_slash_from_dst(dst: &String) -> String {
         String::from(&dst[..dst.len() - 1])
     } else {
         String::from(dst)
+    }
+}
+
+fn worker_log_stdout(stdout: ChildStdout) {
+    for line in BufReader::new(stdout).lines() {
+        match line {
+            Ok(text) => tracing::info!("{text}"),
+            Err(e) => tracing::error!("Error reading line: {}", e),
+        }
+    }
+}
+
+fn worker_log_stderr(stderr: ChildStderr) {
+    for line in BufReader::new(stderr).lines() {
+        match line {
+            Ok(text) => tracing::error!("{text}"),
+            Err(e) => tracing::error!("Error reading line: {}", e),
+        }
     }
 }
 
@@ -52,23 +70,8 @@ pub fn run_rsync(
     let stdout = child.stdout.take().expect("Failed to open stdout");
     let stderr = child.stderr.take().expect("Failed to open stderr");
 
-    let handle_stdout = thread::spawn(move || {
-        for line in BufReader::new(stdout).lines() {
-            match line {
-                Ok(text) => tracing::info!("{text}"),
-                Err(e) => tracing::error!("Error reading line: {}", e),
-            }
-        }
-    });
-
-    let handle_stderr = thread::spawn(move || {
-        for line in BufReader::new(stderr).lines() {
-            match line {
-                Ok(text) => tracing::error!("{text}"),
-                Err(e) => tracing::error!("Error reading line: {}", e),
-            }
-        }
-    });
+    let handle_stdout = thread::spawn(move || worker_log_stdout(stdout));
+    let handle_stderr = thread::spawn(move || worker_log_stderr(stderr));
 
     handle_stdout.join().unwrap();
     handle_stderr.join().unwrap();
