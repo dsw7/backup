@@ -26,7 +26,8 @@ fn worker_log_stderr(stderr: ChildStderr) {
     }
 }
 
-pub fn run_rsync(
+//pub fn run_rsync(
+pub fn run_rsync_subprocess(
     src: &str,
     user: &String,
     host: &String,

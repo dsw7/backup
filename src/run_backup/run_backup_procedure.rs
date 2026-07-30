@@ -3,7 +3,7 @@ use crate::data_directory::get_data_dir;
 use crate::errors::BackupError;
 
 use super::rsync_dry_run;
-use super::subprocesses;
+use super::rsync_live_run;
 
 use std::io::{self, Write};
 use std::path::PathBuf;
@@ -102,7 +102,7 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
         rsync_dry_run::run_rsync_subprocess(&src, user, host, &dst)
     } else {
         let log_file = select_log_file(sync_to_hot)?;
-        subprocesses::run_rsync(&src, user, host, &dst, &log_file)
+        rsync_live_run::run_rsync_subprocess(&src, user, host, &dst, &log_file)
     }
 }
 
