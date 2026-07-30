@@ -10,6 +10,7 @@ use std::thread;
 fn init_logger() {
     tracing_subscriber::fmt()
         .with_max_level(Level::DEBUG)
+        .with_target(false)
         .init();
 }
 
@@ -32,8 +33,8 @@ fn remove_slash_from_dst(dst: &String) -> String {
 fn worker_log_stdout(stdout: ChildStdout) {
     for line in BufReader::new(stdout).lines() {
         match line {
-            Ok(text) => tracing::info!("{text}"),
-            Err(e) => tracing::error!("Error reading line: {}", e),
+            Ok(text) => tracing::info!("(stdout) {text}"),
+            Err(e) => tracing::error!("Error reading line from stdout: {e}"),
         }
     }
 }
@@ -41,8 +42,8 @@ fn worker_log_stdout(stdout: ChildStdout) {
 fn worker_log_stderr(stderr: ChildStderr) {
     for line in BufReader::new(stderr).lines() {
         match line {
-            Ok(text) => tracing::error!("{text}"),
-            Err(e) => tracing::error!("Error reading line: {}", e),
+            Ok(text) => tracing::error!("(stderr) {text}"),
+            Err(e) => tracing::error!("Error reading line from stderr: {e}"),
         }
     }
 }
