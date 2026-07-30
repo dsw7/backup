@@ -109,12 +109,11 @@ pub fn run_rsync_dry_run(
     host: &String,
     dst: &String,
 ) -> Result<(), BackupError> {
+    let src = append_slash_to_src(src);
+    let dst = format!("{user}@{host}:{}", remove_slash_from_dst(dst));
+
     let status = Command::new("rsync")
-        .arg("-av")
-        .arg("--delete")
-        .arg("--dry-run")
-        .arg(append_slash_to_src(src))
-        .arg(format!("{user}@{host}:{}", remove_slash_from_dst(dst)))
+        .args(["-av", "--delete", "--dry-run", &src, &dst])
         .status()?;
 
     if !status.success() {
