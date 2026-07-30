@@ -1,5 +1,4 @@
 use crate::configs::Configs;
-use crate::data_directory::get_data_dir;
 use crate::errors::BackupError;
 
 use super::rsync_dry_run;
@@ -64,13 +63,11 @@ fn select_destination(sync_to_hot: bool, configs: &Configs) -> &String {
     }
 }
 
-fn select_log_file(sync_to_hot: bool) -> io::Result<PathBuf> {
-    let data_dir = get_data_dir()?;
-
+fn select_log_file(sync_to_hot: bool) -> PathBuf {
     if sync_to_hot {
-        Ok(data_dir.join("backup_hot.log"))
+        PathBuf::from("backup_hot.log")
     } else {
-        Ok(data_dir.join("backup_cold.log"))
+        PathBuf::from("backup_cold.log")
     }
 }
 
@@ -101,7 +98,7 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
     if is_dry_run {
         rsync_dry_run::run_rsync_subprocess(&src, user, host, &dst)
     } else {
-        let log_file = select_log_file(sync_to_hot)?;
+        let log_file = select_log_file(sync_to_hot);
         rsync_live_run::run_rsync_subprocess(&src, user, host, &dst, &log_file)
     }
 }

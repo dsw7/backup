@@ -3,6 +3,7 @@ use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::prelude::*;
 
 use crate::errors::BackupError;
+use crate::data_directory::get_data_dir;
 
 use std::io::{self, BufRead, BufReader};
 use std::path::Path;
@@ -86,7 +87,8 @@ pub fn run_rsync_subprocess(
         .with_target(false)
         .with_filter(LevelFilter::DEBUG);
 
-    let file_appender = tracing_appender::rolling::never("/tmp", "app.log");
+    let data_dir = get_data_dir()?;
+    let file_appender = tracing_appender::rolling::never(data_dir, log_file);
     let (non_blocking_file, _guard) = tracing_appender::non_blocking(file_appender);
     // every scope where logging takes place (this + children) must have access to _guard
 
