@@ -31,6 +31,14 @@ fn append_slash_to_src(src: &String) -> String {
     }
 }
 
+fn remove_slash_from_dst(dst: &String) -> String {
+    if dst.ends_with('/') {
+        String::from(&dst[..dst.len() - 1])
+    } else {
+        String::from(dst)
+    }
+}
+
 fn select_user(sync_to_hot: bool, configs: &Configs) -> &String {
     if sync_to_hot {
         &configs.storage.hot.user
@@ -86,13 +94,14 @@ pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
     let src = append_slash_to_src(&configs.source);
     let user = select_user(sync_to_hot, configs);
     let host = select_host(sync_to_hot, configs);
-    let destination = select_destination(sync_to_hot, configs);
+    let dst = select_destination(sync_to_hot, configs);
+    let dst = remove_slash_from_dst(dst);
 
     if is_dry_run {
-        subprocesses::run_rsync_dry_run(&src, user, host, destination)
+        subprocesses::run_rsync_dry_run(&src, user, host, &dst)
     } else {
         let log_file = select_log_file(sync_to_hot)?;
-        subprocesses::run_rsync(&src, user, host, destination, &log_file)
+        subprocesses::run_rsync(&src, user, host, &dst, &log_file)
     }
 }
 

@@ -8,14 +8,6 @@ use std::path::Path;
 use std::process::{ChildStderr, ChildStdout, Command, Stdio};
 use std::thread;
 
-fn remove_slash_from_dst(dst: &String) -> String {
-    if dst.ends_with('/') {
-        String::from(&dst[..dst.len() - 1])
-    } else {
-        String::from(dst)
-    }
-}
-
 fn worker_log_stdout(stdout: ChildStdout) {
     for line in BufReader::new(stdout).lines() {
         match line {
@@ -35,13 +27,13 @@ fn worker_log_stderr(stderr: ChildStderr) {
 }
 
 pub fn run_rsync(
-    src: &String,
+    src: &str,
     user: &String,
     host: &String,
     dst: &String,
     log_file: &Path,
 ) -> Result<(), BackupError> {
-    let dst = format!("{user}@{host}:{}", remove_slash_from_dst(dst));
+    let dst = format!("{user}@{host}:{dst}");
 
     let file_appender = tracing_appender::rolling::daily("/tmp", "app.log");
 
@@ -107,12 +99,12 @@ pub fn run_rsync(
 }
 
 pub fn run_rsync_dry_run(
-    src: &String,
+    src: &str,
     user: &String,
     host: &String,
     dst: &String,
 ) -> Result<(), BackupError> {
-    let dst = format!("{user}@{host}:{}", remove_slash_from_dst(dst));
+    let dst = format!("{user}@{host}:{dst}");
 
     let status = Command::new("rsync")
         .args(["-av", "--delete", "--dry-run", src, &dst])
