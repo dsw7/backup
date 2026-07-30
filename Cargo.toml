@@ -1,7 +1,10 @@
 [package]
-name = "backup"
-version = "0.1.0"
+description = "DSW backup and recovery system"
 edition = "2024"
+license = "MIT"
+name = "backup"
+repository = "https://github.com/dsw7/backup"
+version = "1.0.0"
 
 [dependencies]
 clap = { version = "4.6.4", features = ["derive"] }
