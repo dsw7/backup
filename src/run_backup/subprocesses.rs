@@ -2,7 +2,7 @@ use tracing::Level;
 
 use crate::errors::BackupError;
 
-use std::io::{BufRead, BufReader};
+use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 use std::process::{ChildStderr, ChildStdout, Command, Stdio};
 use std::thread;
@@ -67,8 +67,15 @@ pub fn run_rsync(
         .stderr(Stdio::piped())
         .spawn()?;
 
-    let stdout = child.stdout.take().expect("Failed to open stdout");
-    let stderr = child.stderr.take().expect("Failed to open stderr");
+    let stdout = child
+        .stdout
+        .take()
+        .ok_or_else(|| io::Error::other("Could not capture stdout"))?;
+
+    let stderr = child
+        .stderr
+        .take()
+        .ok_or_else(|| io::Error::other("Could not capture stderr"))?;
 
     let handle_stdout = thread::spawn(move || worker_log_stdout(stdout));
     let handle_stderr = thread::spawn(move || worker_log_stderr(stderr));
