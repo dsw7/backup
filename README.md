@@ -5,7 +5,12 @@ Program for backing up data.
 ## Table of Contents
 
 - [Installation](#installation)
+  - [Step 1 - Install binary](#step-1---install-binary)
+  - [Step 2 - Initialize program](#step-2---initialize-program)
+  - [Step 3 - Edit configurations](#step-3---edit-configurations)
 - [Usage](#usage)
+  - [Run backups](#run-backups)
+  - [Compare `localhost` with backup destinations](#compare-localhost-with-backup-destinations)
 - [License](#license)
 
 ## Installation
