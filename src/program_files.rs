@@ -20,3 +20,7 @@ pub fn get_app_dir() -> io::Result<PathBuf> {
 pub fn get_readme_file(app_dir: &Path) -> PathBuf {
     app_dir.join("README.txt")
 }
+
+pub fn get_config_file(app_dir: &Path) -> PathBuf {
+    app_dir.join("config.toml")
+}

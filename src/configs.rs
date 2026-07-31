@@ -4,7 +4,6 @@ use crate::errors::BackupError;
 use crate::program_files;
 
 use std::fs;
-use std::path::PathBuf;
 
 fn check_not_empty<'de, D>(deserializer: D) -> Result<String, D::Error>
 where
@@ -56,13 +55,9 @@ pub struct Cold {
     pub destination: String,
 }
 
-fn get_config_file_path() -> Result<PathBuf, BackupError> {
-    let program_dir = program_files::get_app_dir()?;
-    Ok(program_dir.join("config.toml"))
-}
-
 pub fn load_configs() -> Result<Configs, BackupError> {
-    let config_file = get_config_file_path()?;
+    let app_dir = program_files::get_app_dir()?;
+    let config_file = program_files::get_config_file(&app_dir);
     let toml_str = fs::read_to_string(&config_file)?;
     let configs = toml::from_str::<Configs>(&toml_str)?;
     Ok(configs)
