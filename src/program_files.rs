@@ -14,16 +14,7 @@ fn get_home_dir() -> io::Result<PathBuf> {
 
 pub fn get_app_dir() -> io::Result<PathBuf> {
     let home_dir = get_home_dir()?;
-    let program_dotdir = home_dir.join(".backup");
-
-    if program_dotdir.exists() {
-        Ok(program_dotdir)
-    } else {
-        Err(io::Error::new(
-            io::ErrorKind::NotFound,
-            "Program data directory does not exist",
-        ))
-    }
+    Ok(home_dir.join(".backup"))
 }
 
 pub fn get_readme_file(app_dir: &Path) -> PathBuf {
