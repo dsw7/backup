@@ -32,7 +32,7 @@ fn manage_readme(program_dotdir: &Path) -> io::Result<()> {
     Ok(())
 }
 
-pub fn get_data_dir() -> io::Result<PathBuf> {
+pub fn get_appdir() -> io::Result<PathBuf> {
     let home_dir = get_home_dir()?;
     let program_dotdir = home_dir.join(".backup");
 

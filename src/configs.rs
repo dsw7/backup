@@ -57,7 +57,7 @@ pub struct Cold {
 }
 
 fn get_config_file_path() -> Result<PathBuf, BackupError> {
-    let program_dir = program_files::get_data_dir()?;
+    let program_dir = program_files::get_appdir()?;
     Ok(program_dir.join("config.toml"))
 }
 

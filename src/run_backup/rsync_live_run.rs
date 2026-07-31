@@ -3,7 +3,7 @@ use tracing_subscriber::prelude::*;
 use tracing_subscriber::{Registry, fmt};
 
 use crate::errors::BackupError;
-use crate::program_files::get_data_dir;
+use crate::program_files::get_appdir;
 
 use std::io::{self, BufRead, BufReader};
 use std::path::{Path, PathBuf};
@@ -30,7 +30,7 @@ fn worker_log_stderr(stderr: ChildStderr) {
 
 #[cfg(debug_assertions)]
 fn get_log_dir() -> io::Result<PathBuf> {
-    let data_dir = get_data_dir()?;
+    let data_dir = get_appdir()?;
     let log_dir = data_dir.join("logs_debug");
 
     println!("\n*** Debug build detected!");
@@ -40,7 +40,7 @@ fn get_log_dir() -> io::Result<PathBuf> {
 
 #[cfg(not(debug_assertions))]
 fn get_log_dir() -> io::Result<PathBuf> {
-    let data_dir = get_data_dir()?;
+    let data_dir = get_appdir()?;
     Ok(data_dir.join("logs"))
 }
 
