@@ -67,7 +67,9 @@ Run:
 ```sh
 backup
 ```
-And select where the data should be backed up to.
+The program will prompt whether to back data up to hot storage or cold storage.
+Additionally, the program will prompt whether to perform a dry run which can be
+useful for testing an installation.
 
 ### Compare `localhost` with backup destinations
 Run:
