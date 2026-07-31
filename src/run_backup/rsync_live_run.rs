@@ -2,8 +2,8 @@ use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::{Registry, fmt};
 
-use crate::data_directory::get_data_dir;
 use crate::errors::BackupError;
+use crate::program_files::get_data_dir;
 
 use std::io::{self, BufRead, BufReader};
 use std::path::{Path, PathBuf};
