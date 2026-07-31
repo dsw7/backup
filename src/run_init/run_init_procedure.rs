@@ -6,7 +6,7 @@ use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
 fn log_new_file(path: &Path) {
-    println!(" (+) `{}`", path.display());
+    println!("(+) {}", path.display());
 }
 
 fn create_app_dir() -> io::Result<PathBuf> {
@@ -44,8 +44,44 @@ fn write_readme(app_dir: &Path) -> io::Result<()> {
     Ok(())
 }
 
+fn write_config_file_contents(config_file: &PathBuf) -> io::Result<()> {
+    let contents = r#"
+# Specify where to sync data from
+source = ""
+
+[storage.hot]
+user = ""
+host = ""
+destination = ""
+#destination = ""
+
+[storage.cold]
+user = ""
+host = ""
+destination = ""
+"#;
+
+    let mut configs = fs::File::create(config_file)?;
+    configs.write_all(contents.as_bytes())?;
+    Ok(())
+}
+
+fn write_config_file(app_dir: &Path) -> io::Result<()> {
+    let config_file = program_files::get_config_file(app_dir);
+
+    if config_file.exists() {
+        println!("Program config file already exists. No action taken");
+    } else {
+        write_config_file_contents(&config_file)?;
+        log_new_file(&config_file);
+    }
+
+    Ok(())
+}
+
 pub fn initialize_program() -> Result<(), BackupError> {
     let app_dir = create_app_dir()?;
     write_readme(&app_dir)?;
+    write_config_file(&app_dir)?;
     Ok(())
 }
