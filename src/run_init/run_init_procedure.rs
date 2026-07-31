@@ -8,10 +8,15 @@ use std::path::PathBuf;
 fn create_app_dir() -> io::Result<PathBuf> {
     let appdir = program_files::get_app_dir()?;
 
-    if !appdir.exists() {
+    if appdir.exists() {
+        println!(
+            "Program application directory `{}` already exists",
+            appdir.display()
+        );
+    } else {
         fs::create_dir(&appdir)?;
         println!(
-            "Created program application directory: {}",
+            "Created program application directory: `{}`",
             appdir.display()
         );
     }
