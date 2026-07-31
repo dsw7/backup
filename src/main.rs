@@ -31,11 +31,14 @@ enum Commands {
     /// Run backup procedure (this is the default)
     Backup,
 
-    /// Report when backups were made
-    Latest,
+    /// Set up the program
+    Init,
 
     /// Compare local and remote backup directory sizes
     Diff,
+
+    /// Report when backups were made
+    Latest,
 }
 
 fn run_command() -> Result<(), BackupError> {
@@ -44,6 +47,7 @@ fn run_command() -> Result<(), BackupError> {
 
     match &cli.command {
         Some(Commands::Backup) => run_backup_procedure(&configs),
+        Some(Commands::Init) => unimplemented!("Not ready!"),
         Some(Commands::Diff) => run_diff_procedure(&configs),
         Some(Commands::Latest) => unimplemented!("Not ready!"),
         None => run_backup_procedure(&configs),
