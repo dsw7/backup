@@ -9,11 +9,15 @@ fn log_new_file(path: &Path) {
     println!("(+) {}", path.display());
 }
 
+fn log_already_exists(path: &Path) {
+    println!("Already exists: {}", path.display());
+}
+
 fn create_app_dir() -> io::Result<PathBuf> {
     let appdir = program_files::get_app_dir()?;
 
     if appdir.exists() {
-        println!("Program application directory already exists. No action taken");
+        log_already_exists(&appdir);
     } else {
         fs::create_dir(&appdir)?;
         log_new_file(&appdir);
@@ -35,7 +39,7 @@ fn write_readme(app_dir: &Path) -> io::Result<()> {
     let path_readme = program_files::get_readme_file(app_dir);
 
     if path_readme.exists() {
-        println!("Program README already exists. No action taken");
+        log_already_exists(&path_readme);
     } else {
         write_readme_contents(&path_readme)?;
         log_new_file(&path_readme);
@@ -68,7 +72,7 @@ fn write_config_file(app_dir: &Path) -> io::Result<()> {
     let config_file = program_files::get_config_file(app_dir);
 
     if config_file.exists() {
-        println!("Program config file already exists. No action taken");
+        log_already_exists(&config_file);
     } else {
         write_config_file_contents(&config_file)?;
         log_new_file(&config_file);
