@@ -3,10 +3,10 @@ use tracing_subscriber::prelude::*;
 use tracing_subscriber::{Registry, fmt};
 
 use crate::errors::BackupError;
-use crate::program_files::get_app_dir;
+use crate::program_files;
 
 use std::io::{self, BufRead, BufReader};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::{ChildStderr, ChildStdout, Command, Stdio};
 use std::thread;
 
@@ -26,22 +26,6 @@ fn worker_log_stderr(stderr: ChildStderr) {
             Err(e) => tracing::error!("Error reading line from stderr: {e}"),
         }
     }
-}
-
-#[cfg(debug_assertions)]
-fn get_log_dir() -> io::Result<PathBuf> {
-    let data_dir = get_app_dir()?;
-    let log_dir = data_dir.join("logs_debug");
-
-    println!("\n*** Debug build detected!");
-    println!("*** Will place log files under: {}\n", log_dir.display());
-    Ok(log_dir)
-}
-
-#[cfg(not(debug_assertions))]
-fn get_log_dir() -> io::Result<PathBuf> {
-    let data_dir = get_app_dir()?;
-    Ok(data_dir.join("logs"))
 }
 
 pub fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> Result<(), BackupError> {
@@ -103,7 +87,8 @@ pub fn run_rsync_subprocess(
         .with_target(false)
         .with_filter(LevelFilter::DEBUG);
 
-    let log_dir = get_log_dir()?;
+    let app_dir = program_files::get_app_dir()?;
+    let log_dir = program_files::get_log_dir(&app_dir);
     let file_appender = tracing_appender::rolling::never(log_dir, log_file);
     let (non_blocking_file, _guard) = tracing_appender::non_blocking(file_appender);
     // every scope where logging takes place (this + children) must have access to _guard
