@@ -66,7 +66,7 @@ fn select_log_file(sync_to_hot: bool) -> PathBuf {
     }
 }
 
-pub fn run_backup_procedure(configs: &Configs) -> Result<(), BackupError> {
+pub fn run_data_backup(configs: &Configs) -> Result<(), BackupError> {
     println!("Select backup type:");
     println!("[1] -> Synchronize directories to HOT storage");
     println!("[2] -> Synchronize directories to HOT storage [DRY RUN]");

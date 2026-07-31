@@ -1,15 +1,16 @@
 mod configs;
-mod data_directory;
 mod errors;
+mod program_files;
 mod run_backup;
 mod run_diff;
+mod run_init;
 
 use clap::{Parser, Subcommand};
 
-use configs::load_configs;
 use errors::BackupError;
 use run_backup::run_backup_procedure;
 use run_diff::run_diff_procedure;
+use run_init::initialize_program;
 
 use std::process::ExitCode;
 
@@ -28,11 +29,11 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Set up the program
+    Init,
+
     /// Run backup procedure (this is the default)
     Backup,
-
-    /// Report when backups were made
-    Latest,
 
     /// Compare local and remote backup directory sizes
     Diff,
@@ -40,13 +41,12 @@ enum Commands {
 
 fn run_command() -> Result<(), BackupError> {
     let cli = Cli::parse();
-    let configs = load_configs()?;
 
     match &cli.command {
-        Some(Commands::Backup) => run_backup_procedure(&configs),
-        Some(Commands::Diff) => run_diff_procedure(&configs),
-        Some(Commands::Latest) => unimplemented!("Not ready!"),
-        None => run_backup_procedure(&configs),
+        Some(Commands::Init) => initialize_program(),
+        Some(Commands::Backup) => run_backup_procedure(),
+        Some(Commands::Diff) => run_diff_procedure(),
+        None => run_backup_procedure(),
     }
 }
 

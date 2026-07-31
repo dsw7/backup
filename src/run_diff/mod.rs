@@ -1,5 +1,10 @@
+use crate::configs::load_configs;
+use crate::errors::BackupError;
+
+mod run_diff_procedure;
 mod subprocesses;
 
-pub mod run_diff_procedure;
-
-pub use self::run_diff_procedure::run_diff_procedure;
+pub fn run_diff_procedure() -> Result<(), BackupError> {
+    let configs = load_configs()?;
+    self::run_diff_procedure::get_diff_between_machines(&configs)
+}

@@ -71,7 +71,7 @@ fn display_failed_usages(usages: &Vec<Usage>) {
     }
 }
 
-pub fn run_diff_procedure(configs: &Configs) -> Result<(), BackupError> {
+pub fn get_diff_between_machines(configs: &Configs) -> Result<(), BackupError> {
     let usages = get_disk_usages(configs)?;
 
     display_usages(&usages)?;
