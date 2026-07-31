@@ -7,7 +7,6 @@ mod run_init;
 
 use clap::{Parser, Subcommand};
 
-use configs::load_configs;
 use errors::BackupError;
 use run_backup::run_backup_procedure;
 use run_diff::run_diff_procedure;
@@ -45,14 +44,13 @@ enum Commands {
 
 fn run_command() -> Result<(), BackupError> {
     let cli = Cli::parse();
-    let configs = load_configs()?;
 
     match &cli.command {
         Some(Commands::Init) => initialize_program(),
-        Some(Commands::Backup) => run_backup_procedure(&configs),
-        Some(Commands::Diff) => run_diff_procedure(&configs),
+        Some(Commands::Backup) => run_backup_procedure(),
+        Some(Commands::Diff) => run_diff_procedure(),
         Some(Commands::Latest) => unimplemented!("Not ready!"),
-        None => run_backup_procedure(&configs),
+        None => run_backup_procedure(),
     }
 }
 
