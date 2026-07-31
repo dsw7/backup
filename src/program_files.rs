@@ -1,6 +1,5 @@
 use std::env;
-use std::fs::File;
-use std::io::{self, Write};
+use std::io;
 use std::path::{Path, PathBuf};
 
 fn get_home_dir() -> io::Result<PathBuf> {
@@ -13,31 +12,11 @@ fn get_home_dir() -> io::Result<PathBuf> {
     }
 }
 
-fn write_readme_contents(path_readme: &Path) -> io::Result<()> {
-    let contents = "* DSW data backup system
-* For more information, see https://github.com/dsw7/backup";
-
-    let mut readme = File::create(path_readme)?;
-    readme.write_all(contents.as_bytes())?;
-    Ok(())
-}
-
-fn manage_readme(program_dotdir: &Path) -> io::Result<()> {
-    let path_readme = program_dotdir.join("README.txt");
-
-    if !path_readme.exists() {
-        write_readme_contents(&path_readme)?;
-    }
-
-    Ok(())
-}
-
 pub fn get_app_dir() -> io::Result<PathBuf> {
     let home_dir = get_home_dir()?;
     let program_dotdir = home_dir.join(".backup");
 
     if program_dotdir.exists() {
-        manage_readme(&program_dotdir)?;
         Ok(program_dotdir)
     } else {
         Err(io::Error::new(
@@ -45,4 +24,8 @@ pub fn get_app_dir() -> io::Result<PathBuf> {
             "Program data directory does not exist",
         ))
     }
+}
+
+pub fn get_readme_file(app_dir: &Path) -> PathBuf {
+    app_dir.join("README.txt")
 }
