@@ -45,15 +45,13 @@ fn write_readme(app_dir: &Path) -> io::Result<()> {
 }
 
 fn write_config_file_contents(config_file: &PathBuf) -> io::Result<()> {
-    let contents = r#"
-# Specify where to sync data from
+    let contents = r#"# Specify where to sync data from
 source = ""
 
 [storage.hot]
 user = ""
 host = ""
 destination = ""
-#destination = ""
 
 [storage.cold]
 user = ""
