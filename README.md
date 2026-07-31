@@ -1,9 +1,11 @@
 # `backup`
 
-Program for backing up data.
+Program for backing up data. Ported from Python. The Python program felt clunky
+and slow. Additionally, virtual environments were a pain to work with.
 
 ## Table of Contents
 
+- [Synopsis](#synopsis)
 - [Installation](#installation)
   - [Step 1 - Install binary](#step-1---install-binary)
   - [Step 2 - Initialize program](#step-2---initialize-program)
@@ -12,6 +14,28 @@ Program for backing up data.
   - [Run backups](#run-backups)
   - [Compare `localhost` with backup destinations](#compare-localhost-with-backup-destinations)
 - [License](#license)
+
+## Synopsis
+
+This backup system backs data up to two destinations:
+<table>
+  <thead>
+    <tr>
+      <th>Target</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Hot storage</td>
+      <td>Machine that is hard wired into the network. Data is frequently backed up to this machine to closely mirror the source</td>
+    </tr>
+    <tr>
+      <td>Cold storage</td>
+      <td>Machine that is NOT hard wired into the network. Data is infrequently backed up to this machine</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Installation
 
