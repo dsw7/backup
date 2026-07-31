@@ -29,17 +29,14 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Run backup procedure (this is the default)
-    Backup,
-
     /// Set up the program
     Init,
 
+    /// Run backup procedure (this is the default)
+    Backup,
+
     /// Compare local and remote backup directory sizes
     Diff,
-
-    /// Report when backups were made
-    Latest,
 }
 
 fn run_command() -> Result<(), BackupError> {
@@ -49,7 +46,6 @@ fn run_command() -> Result<(), BackupError> {
         Some(Commands::Init) => initialize_program(),
         Some(Commands::Backup) => run_backup_procedure(),
         Some(Commands::Diff) => run_diff_procedure(),
-        Some(Commands::Latest) => unimplemented!("Not ready!"),
         None => run_backup_procedure(),
     }
 }
