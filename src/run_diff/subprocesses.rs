@@ -1,5 +1,4 @@
 use crate::configs::Configs;
-use crate::errors::BackupError;
 
 use std::process::{Command, Output, Stdio};
 
@@ -44,7 +43,7 @@ fn unpack_output(host: &String, output: &Output) -> Usage {
     }
 }
 
-pub fn get_disk_usages(configs: &Configs) -> Result<Vec<Usage>, BackupError> {
+pub fn get_disk_usages(configs: &Configs) -> anyhow::Result<Vec<Usage>, > {
     let proc_localhost = Command::new("du")
         .args(["--summarize", "--bytes", &configs.source])
         .stdout(Stdio::piped())
