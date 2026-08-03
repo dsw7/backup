@@ -89,23 +89,52 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_unpack_stdout_valid_cases() {
-        assert_eq!(
-            unpack_stdout("16411   /tmp/bar/"),
-            Ok((16411, "/tmp/bar/".into()))
-        );
-        assert_eq!(
-            unpack_stdout("   16411   /tmp/bar/"),
-            Ok((16411, "/tmp/bar/".into()))
-        );
-        assert_eq!(
-            unpack_stdout("16411   /tmp/bar/   "),
-            Ok((16411, "/tmp/bar/".into()))
-        );
-        assert_eq!(unpack_stdout("16411 "), Ok((16411, "-".into())));
-        assert_eq!(unpack_stdout("16411"), Ok((16411, "-".into())));
-        assert_eq!(unpack_stdout(" "), Ok((0, "-".into())));
-        assert_eq!(unpack_stdout(""), Ok((0, "-".into())));
+    fn test_unpack_stdout_valid_cases_1() -> anyhow::Result<()> {
+        let res = unpack_stdout("16411   /tmp/bar/")?;
+        assert_eq!(res, (16411, "/tmp/bar/".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_2() -> anyhow::Result<()> {
+        let res = unpack_stdout("   16411   /tmp/bar/")?;
+        assert_eq!(res, (16411, "/tmp/bar/".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_3() -> anyhow::Result<()> {
+        let res = unpack_stdout("16411   /tmp/bar/   ")?;
+        assert_eq!(res, (16411, "/tmp/bar/".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_4() -> anyhow::Result<()> {
+        let res = unpack_stdout("16411 ")?;
+        assert_eq!(res, (16411, "-".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_5() -> anyhow::Result<()> {
+        let res = unpack_stdout("16411")?;
+        assert_eq!(res, (16411, "-".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_6() -> anyhow::Result<()> {
+        let res = unpack_stdout(" ")?;
+        assert_eq!(res, (0, "-".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_7() -> anyhow::Result<()> {
+        let res = unpack_stdout("")?;
+        assert_eq!(res, (0, "-".into()));
+        Ok(())
     }
 
     #[test]
