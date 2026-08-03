@@ -1,8 +1,8 @@
+use std::process::{Command, Output, Stdio};
+
 use anyhow::Context;
 
 use crate::configs::Configs;
-
-use std::process::{Command, Output, Stdio};
 
 fn get_ssh_dest_hot(configs: &Configs) -> String {
     format!(

@@ -4,11 +4,13 @@ use crate::configs::Configs;
 
 use super::subprocesses::{Usage, get_disk_usages};
 
-fn unpack_stdout(stdout: &str) -> Result<(usize, String), std::num::ParseIntError> {
+fn unpack_stdout(stdout: &str) -> anyhow::Result<(usize, String)> {
     let parts: Vec<&str> = stdout.split_whitespace().collect();
 
     let bytes = match parts.first() {
-        Some(val) => val.parse::<usize>()?,
+        Some(val) => val
+            .parse::<usize>()
+            .context(format!("Failed to parse {val} to usize"))?,
         None => 0,
     };
 
@@ -73,9 +75,9 @@ fn display_failed_usages(usages: &Vec<Usage>) {
 }
 
 pub fn get_diff_between_machines(configs: &Configs) -> anyhow::Result<()> {
-    let usages = get_disk_usages(configs)?;
+    let usages = get_disk_usages(configs).context("Failed to get disk usages")?;
 
-    display_usages(&usages)?;
+    display_usages(&usages).context("Failed to display disk usages")?;
     println!();
     display_failed_usages(&usages);
 
