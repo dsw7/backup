@@ -1,4 +1,5 @@
 use crate::program_files;
+use anyhow::Context;
 
 use std::fs;
 use std::io::Write;
@@ -18,7 +19,7 @@ fn create_app_dir() -> anyhow::Result<PathBuf> {
     if appdir.exists() {
         log_already_exists(&appdir);
     } else {
-        fs::create_dir(&appdir)?;
+        fs::create_dir(&appdir).context(format!("Failed to create {}", appdir.display()))?;
         log_new_file(&appdir);
     }
 
@@ -29,8 +30,13 @@ fn write_readme_contents(path_readme: &PathBuf) -> anyhow::Result<()> {
     let contents = "* DSW data backup system
 * For more information, see https://github.com/dsw7/backup";
 
-    let mut readme = fs::File::create(path_readme)?;
-    readme.write_all(contents.as_bytes())?;
+    let mut readme = fs::File::create(path_readme)
+        .context(format!("Could not create {}", path_readme.display()))?;
+
+    readme
+        .write_all(contents.as_bytes())
+        .context(format!("Could not write to {}", path_readme.display()))?;
+
     Ok(())
 }
 
@@ -62,8 +68,15 @@ host = ""
 destination = ""
 "#;
 
-    let mut configs = fs::File::create(config_file)?;
-    configs.write_all(contents.as_bytes())?;
+    let mut configs = fs::File::create(config_file).context(format!(
+        "Could not create the configuration file: {}",
+        config_file.display()
+    ))?;
+
+    configs
+        .write_all(contents.as_bytes())
+        .context(format!("Could not write to {}", config_file.display()))?;
+
     Ok(())
 }
 
