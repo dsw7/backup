@@ -1,7 +1,8 @@
-use crate::configs::Configs;
-use crate::errors::BackupError;
-
 use std::process::{Command, Output, Stdio};
+
+use anyhow::Context;
+
+use crate::configs::Configs;
 
 fn get_ssh_dest_hot(configs: &Configs) -> String {
     format!(
@@ -44,12 +45,13 @@ fn unpack_output(host: &String, output: &Output) -> Usage {
     }
 }
 
-pub fn get_disk_usages(configs: &Configs) -> Result<Vec<Usage>, BackupError> {
+pub fn get_disk_usages(configs: &Configs) -> anyhow::Result<Vec<Usage>> {
     let proc_localhost = Command::new("du")
         .args(["--summarize", "--bytes", &configs.source])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .spawn()?;
+        .spawn()
+        .context("Something went wrong when spawning `du` command")?;
 
     let proc_hot_backup = Command::new("ssh")
         .arg(get_ssh_dest_hot(configs))
@@ -59,7 +61,8 @@ pub fn get_disk_usages(configs: &Configs) -> Result<Vec<Usage>, BackupError> {
         ))
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .spawn()?;
+        .spawn()
+        .context("Something went wrong when spawning `ssh` command")?;
 
     let proc_cold_backup = Command::new("ssh")
         .arg(get_ssh_dest_cold(configs))
@@ -69,11 +72,18 @@ pub fn get_disk_usages(configs: &Configs) -> Result<Vec<Usage>, BackupError> {
         ))
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .spawn()?;
+        .spawn()
+        .context("Something went wrong when spawning `ssh` command")?;
 
-    let output_localhost = proc_localhost.wait_with_output()?;
-    let output_hot_backup = proc_hot_backup.wait_with_output()?;
-    let output_cold_backup = proc_cold_backup.wait_with_output()?;
+    let output_localhost = proc_localhost
+        .wait_with_output()
+        .context("Failed to wait on localhost")?;
+    let output_hot_backup = proc_hot_backup
+        .wait_with_output()
+        .context("Failed to wait on hot backup")?;
+    let output_cold_backup = proc_cold_backup
+        .wait_with_output()
+        .context("Failed to wait on cold backup")?;
 
     let results = vec![
         unpack_output(&String::from("localhost"), &output_localhost),

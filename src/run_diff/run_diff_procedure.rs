@@ -1,13 +1,16 @@
+use anyhow::Context;
+
 use crate::configs::Configs;
-use crate::errors::BackupError;
 
 use super::subprocesses::{Usage, get_disk_usages};
 
-fn unpack_stdout(stdout: &str) -> Result<(usize, String), std::num::ParseIntError> {
+fn unpack_stdout(stdout: &str) -> anyhow::Result<(usize, String)> {
     let parts: Vec<&str> = stdout.split_whitespace().collect();
 
     let bytes = match parts.first() {
-        Some(val) => val.parse::<usize>()?,
+        Some(val) => val
+            .parse::<usize>()
+            .context(format!("Failed to parse {val} to usize"))?,
         None => 0,
     };
 
@@ -36,7 +39,7 @@ fn bytes_to_human_readable(usage_bytes: usize) -> String {
     }
 }
 
-fn display_usages(usages: &Vec<Usage>) -> Result<(), BackupError> {
+fn display_usages(usages: &Vec<Usage>) -> anyhow::Result<()> {
     println!(
         "{:<20} {:<25} {:<16} Usage",
         "Host", "Path", "Usage (bytes)"
@@ -71,10 +74,10 @@ fn display_failed_usages(usages: &Vec<Usage>) {
     }
 }
 
-pub fn get_diff_between_machines(configs: &Configs) -> Result<(), BackupError> {
-    let usages = get_disk_usages(configs)?;
+pub fn get_diff_between_machines(configs: &Configs) -> anyhow::Result<()> {
+    let usages = get_disk_usages(configs).context("Failed to get disk usages")?;
 
-    display_usages(&usages)?;
+    display_usages(&usages).context("Failed to display disk usages")?;
     println!();
     display_failed_usages(&usages);
 
@@ -86,28 +89,61 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_unpack_stdout_valid_cases() {
-        assert_eq!(
-            unpack_stdout("16411   /tmp/bar/"),
-            Ok((16411, "/tmp/bar/".into()))
-        );
-        assert_eq!(
-            unpack_stdout("   16411   /tmp/bar/"),
-            Ok((16411, "/tmp/bar/".into()))
-        );
-        assert_eq!(
-            unpack_stdout("16411   /tmp/bar/   "),
-            Ok((16411, "/tmp/bar/".into()))
-        );
-        assert_eq!(unpack_stdout("16411 "), Ok((16411, "-".into())));
-        assert_eq!(unpack_stdout("16411"), Ok((16411, "-".into())));
-        assert_eq!(unpack_stdout(" "), Ok((0, "-".into())));
-        assert_eq!(unpack_stdout(""), Ok((0, "-".into())));
+    fn test_unpack_stdout_valid_cases_1() -> anyhow::Result<()> {
+        let res = unpack_stdout("16411   /tmp/bar/")?;
+        assert_eq!(res, (16411, "/tmp/bar/".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_2() -> anyhow::Result<()> {
+        let res = unpack_stdout("   16411   /tmp/bar/")?;
+        assert_eq!(res, (16411, "/tmp/bar/".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_3() -> anyhow::Result<()> {
+        let res = unpack_stdout("16411   /tmp/bar/   ")?;
+        assert_eq!(res, (16411, "/tmp/bar/".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_4() -> anyhow::Result<()> {
+        let res = unpack_stdout("16411 ")?;
+        assert_eq!(res, (16411, "-".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_5() -> anyhow::Result<()> {
+        let res = unpack_stdout("16411")?;
+        assert_eq!(res, (16411, "-".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_6() -> anyhow::Result<()> {
+        let res = unpack_stdout(" ")?;
+        assert_eq!(res, (0, "-".into()));
+        Ok(())
+    }
+
+    #[test]
+    fn test_unpack_stdout_valid_cases_7() -> anyhow::Result<()> {
+        let res = unpack_stdout("")?;
+        assert_eq!(res, (0, "-".into()));
+        Ok(())
     }
 
     #[test]
     fn test_unpack_stdout_not_parsable() {
-        assert!(matches!(unpack_stdout("?????   /tmp/bar/"), Err(_)));
+        let res = unpack_stdout("?????   /tmp/bar/");
+        assert!(res.is_err());
+
+        let error = res.unwrap_err();
+        assert_eq!(error.to_string(), "Failed to parse ????? to usize");
     }
 
     #[test]

@@ -1,9 +1,9 @@
+use std::fs;
+
+use anyhow::Context;
 use serde::{Deserialize, Deserializer};
 
-use crate::errors::BackupError;
 use crate::program_files;
-
-use std::fs;
 
 fn check_not_empty<'de, D>(deserializer: D) -> Result<String, D::Error>
 where
@@ -55,10 +55,15 @@ pub struct Cold {
     pub destination: String,
 }
 
-pub fn load_configs() -> Result<Configs, BackupError> {
+pub fn load_configs() -> anyhow::Result<Configs> {
     let app_dir = program_files::get_app_dir()?;
     let config_file = program_files::get_config_file(&app_dir);
-    let toml_str = fs::read_to_string(&config_file)?;
-    let configs = toml::from_str::<Configs>(&toml_str)?;
+
+    let toml_str = fs::read_to_string(&config_file)
+        .context(format!("Cannot read {}", config_file.display()))?;
+
+    let configs = toml::from_str::<Configs>(&toml_str)
+        .context(format!("Failed to parse {}", config_file.display()))?;
+
     Ok(configs)
 }

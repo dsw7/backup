@@ -1,18 +1,16 @@
 mod configs;
-mod errors;
 mod program_files;
 mod run_backup;
 mod run_diff;
 mod run_init;
 
+use std::process::ExitCode;
+
 use clap::{Parser, Subcommand};
 
-use errors::BackupError;
 use run_backup::run_backup_procedure;
 use run_diff::run_diff_procedure;
 use run_init::initialize_program;
-
-use std::process::ExitCode;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -39,7 +37,7 @@ enum Commands {
     Diff,
 }
 
-fn run_command() -> Result<(), BackupError> {
+fn run_command() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match &cli.command {
@@ -54,7 +52,7 @@ fn main() -> ExitCode {
     match run_command() {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("{error}");
+            eprintln!("{error:?}");
             ExitCode::FAILURE
         }
     }

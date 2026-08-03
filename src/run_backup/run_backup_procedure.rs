@@ -1,12 +1,13 @@
-use crate::configs::Configs;
-use crate::errors::BackupError;
-
-use super::rsync_dry_run;
-use super::rsync_live_run;
-
 use std::io::{self, Write};
 use std::path::PathBuf;
 use std::str::FromStr;
+
+use anyhow::Context;
+
+use crate::configs::Configs;
+
+use super::rsync_dry_run;
+use super::rsync_live_run;
 
 fn read_option_from_stdin() -> io::Result<i32> {
     print!("> ");
@@ -66,7 +67,7 @@ fn select_log_file(sync_to_hot: bool) -> PathBuf {
     }
 }
 
-pub fn run_data_backup(configs: &Configs) -> Result<(), BackupError> {
+pub fn run_data_backup(configs: &Configs) -> anyhow::Result<()> {
     println!("Select backup type:");
     println!("[1] -> Synchronize directories to HOT storage");
     println!("[2] -> Synchronize directories to HOT storage [DRY RUN]");
@@ -74,7 +75,8 @@ pub fn run_data_backup(configs: &Configs) -> Result<(), BackupError> {
     println!("[4] -> Synchronize directories to COLD storage [DRY RUN]");
     println!("[*] -> Exit program");
 
-    let option = read_option_from_stdin()?;
+    let option = read_option_from_stdin()
+        .context("Something went wrong when communicating with stdin/stdout")?;
 
     if !(1..=4).contains(&option) {
         println!("Backup was manually aborted");
@@ -100,18 +102,17 @@ pub fn run_data_backup(configs: &Configs) -> Result<(), BackupError> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_append_slash_to_src() {
-        assert_eq!(super::append_slash_to_src(&"/tmp/bar".into()), "/tmp/bar/");
-        assert_eq!(super::append_slash_to_src(&"/tmp/bar/".into()), "/tmp/bar/");
+        assert_eq!(append_slash_to_src(&"/tmp/bar".into()), "/tmp/bar/");
+        assert_eq!(append_slash_to_src(&"/tmp/bar/".into()), "/tmp/bar/");
     }
 
     #[test]
     fn test_remove_slash_from_dst() {
-        assert_eq!(super::remove_slash_from_dst(&"/tmp/bar".into()), "/tmp/bar");
-        assert_eq!(
-            super::remove_slash_from_dst(&"/tmp/bar/".into()),
-            "/tmp/bar"
-        );
+        assert_eq!(remove_slash_from_dst(&"/tmp/bar".into()), "/tmp/bar");
+        assert_eq!(remove_slash_from_dst(&"/tmp/bar/".into()), "/tmp/bar");
     }
 }
