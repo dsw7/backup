@@ -1,5 +1,4 @@
 mod configs;
-mod errors;
 mod program_files;
 mod run_backup;
 mod run_diff;
