@@ -1,13 +1,14 @@
+use std::io::{self, BufRead, BufReader};
+use std::path::Path;
+use std::process::{ChildStderr, ChildStdout, Command, Stdio};
+use std::thread;
+
+use anyhow::Context;
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::{Registry, fmt};
 
 use crate::program_files;
-
-use std::io::{self, BufRead, BufReader};
-use std::path::Path;
-use std::process::{ChildStderr, ChildStdout, Command, Stdio};
-use std::thread;
 
 fn worker_log_stdout(stdout: ChildStdout) {
     for line in BufReader::new(stdout).lines() {
@@ -27,7 +28,7 @@ fn worker_log_stderr(stderr: ChildStderr) {
     }
 }
 
-pub fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> anyhow::Result<()> {
+fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> anyhow::Result<()> {
     tracing::info!("Starting data synchronization");
 
     let dst = format!("{user}@{host}:{dst}");
@@ -36,7 +37,8 @@ pub fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> anyho
         .args(["-av", "--delete", src, &dst])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .spawn()?;
+        .spawn()
+        .context("Failed to spawn `rsync` subprocess")?;
 
     let stdout = child
         .stdout
@@ -59,7 +61,9 @@ pub fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> anyho
         anyhow::bail!("The stderr thread failed");
     }
 
-    let status = child.wait()?;
+    let status = child
+        .wait()
+        .context("Failed to wait on `rsync` subprocess")?;
 
     if status.success() {
         tracing::info!("Synchronization succeeded\n");
