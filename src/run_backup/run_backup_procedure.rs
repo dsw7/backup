@@ -102,18 +102,17 @@ pub fn run_data_backup(configs: &Configs) -> anyhow::Result<()> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_append_slash_to_src() {
-        assert_eq!(super::append_slash_to_src(&"/tmp/bar".into()), "/tmp/bar/");
-        assert_eq!(super::append_slash_to_src(&"/tmp/bar/".into()), "/tmp/bar/");
+        assert_eq!(append_slash_to_src(&"/tmp/bar".into()), "/tmp/bar/");
+        assert_eq!(append_slash_to_src(&"/tmp/bar/".into()), "/tmp/bar/");
     }
 
     #[test]
     fn test_remove_slash_from_dst() {
-        assert_eq!(super::remove_slash_from_dst(&"/tmp/bar".into()), "/tmp/bar");
-        assert_eq!(
-            super::remove_slash_from_dst(&"/tmp/bar/".into()),
-            "/tmp/bar"
-        );
+        assert_eq!(remove_slash_from_dst(&"/tmp/bar".into()), "/tmp/bar");
+        assert_eq!(remove_slash_from_dst(&"/tmp/bar/".into()), "/tmp/bar");
     }
 }
