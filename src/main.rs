@@ -4,13 +4,13 @@ mod run_backup;
 mod run_diff;
 mod run_init;
 
+use std::process::ExitCode;
+
 use clap::{Parser, Subcommand};
 
 use run_backup::run_backup_procedure;
 use run_diff::run_diff_procedure;
 use run_init::initialize_program;
-
-use std::process::ExitCode;
 
 #[derive(Parser, Debug)]
 #[command(

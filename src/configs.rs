@@ -1,9 +1,9 @@
+use std::fs;
+
 use anyhow::Context;
 use serde::{Deserialize, Deserializer};
 
 use crate::program_files;
-
-use std::fs;
 
 fn check_not_empty<'de, D>(deserializer: D) -> Result<String, D::Error>
 where

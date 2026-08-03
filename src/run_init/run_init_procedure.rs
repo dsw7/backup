@@ -1,9 +1,10 @@
-use crate::program_files;
-use anyhow::Context;
-
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
+
+use anyhow::Context;
+
+use crate::program_files;
 
 fn log_new_file(path: &Path) {
     println!("(+) {}", path.display());
