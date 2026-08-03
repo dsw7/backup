@@ -8,4 +8,7 @@ mod subprocesses;
 pub fn run_diff_procedure() -> anyhow::Result<()> {
     let configs = load_configs().context("Failed to load configurations")?;
     self::run_diff_procedure::get_diff_between_machines(&configs)
+        .context("Diff procedure failed")?;
+
+    Ok(())
 }

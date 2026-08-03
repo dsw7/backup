@@ -1,11 +1,13 @@
+use std::io::{self, Write};
+use std::path::PathBuf;
+use std::str::FromStr;
+
+use anyhow::Context;
+
 use crate::configs::Configs;
 
 use super::rsync_dry_run;
 use super::rsync_live_run;
-
-use std::io::{self, Write};
-use std::path::PathBuf;
-use std::str::FromStr;
 
 fn read_option_from_stdin() -> io::Result<i32> {
     print!("> ");
@@ -73,7 +75,8 @@ pub fn run_data_backup(configs: &Configs) -> anyhow::Result<()> {
     println!("[4] -> Synchronize directories to COLD storage [DRY RUN]");
     println!("[*] -> Exit program");
 
-    let option = read_option_from_stdin()?;
+    let option = read_option_from_stdin()
+        .context("Something went wrong when communicating with stdin/stdout")?;
 
     if !(1..=4).contains(&option) {
         println!("Backup was manually aborted");
