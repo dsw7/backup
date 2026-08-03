@@ -52,7 +52,7 @@ fn main() -> ExitCode {
     match run_command() {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("{error}");
+            eprintln!("{error:?}");
             ExitCode::FAILURE
         }
     }
