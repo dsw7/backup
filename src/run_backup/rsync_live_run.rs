@@ -2,7 +2,6 @@ use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::{Registry, fmt};
 
-use crate::errors::BackupError;
 use crate::program_files;
 
 use std::io::{self, BufRead, BufReader};
@@ -28,7 +27,7 @@ fn worker_log_stderr(stderr: ChildStderr) {
     }
 }
 
-pub fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> Result<(), BackupError> {
+pub fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> anyhow::Result<()> {
     tracing::info!("Starting data synchronization");
 
     let dst = format!("{user}@{host}:{dst}");
@@ -53,15 +52,11 @@ pub fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> Resul
     let handle_stderr = thread::spawn(move || worker_log_stderr(stderr));
 
     if handle_stdout.join().is_err() {
-        return Err(BackupError::IO {
-            source: io::Error::other("The stdout thread failed"),
-        });
+        anyhow::bail!("The stdout thread failed");
     }
 
     if handle_stderr.join().is_err() {
-        return Err(BackupError::IO {
-            source: io::Error::other("The stderr thread failed"),
-        });
+        anyhow::bail!("The stderr thread failed");
     }
 
     let status = child.wait()?;
@@ -81,7 +76,7 @@ pub fn run_rsync_subprocess(
     host: &String,
     dst: &String,
     log_file: &Path,
-) -> Result<(), BackupError> {
+) -> anyhow::Result<()> {
     let stdout_layer = fmt::layer()
         .with_writer(io::stdout)
         .with_target(false)

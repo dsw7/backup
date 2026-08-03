@@ -1,8 +1,7 @@
-use crate::errors::BackupError;
 use crate::program_files;
 
 use std::fs;
-use std::io::{self, Write};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 fn log_new_file(path: &Path) {
@@ -13,7 +12,7 @@ fn log_already_exists(path: &Path) {
     println!("Already exists: {}", path.display());
 }
 
-fn create_app_dir() -> io::Result<PathBuf> {
+fn create_app_dir() -> anyhow::Result<PathBuf> {
     let appdir = program_files::get_app_dir()?;
 
     if appdir.exists() {
@@ -26,7 +25,7 @@ fn create_app_dir() -> io::Result<PathBuf> {
     Ok(appdir)
 }
 
-fn write_readme_contents(path_readme: &PathBuf) -> io::Result<()> {
+fn write_readme_contents(path_readme: &PathBuf) -> anyhow::Result<()> {
     let contents = "* DSW data backup system
 * For more information, see https://github.com/dsw7/backup";
 
@@ -35,7 +34,7 @@ fn write_readme_contents(path_readme: &PathBuf) -> io::Result<()> {
     Ok(())
 }
 
-fn write_readme(app_dir: &Path) -> io::Result<()> {
+fn write_readme(app_dir: &Path) -> anyhow::Result<()> {
     let path_readme = program_files::get_readme_file(app_dir);
 
     if path_readme.exists() {
@@ -48,7 +47,7 @@ fn write_readme(app_dir: &Path) -> io::Result<()> {
     Ok(())
 }
 
-fn write_config_file_contents(config_file: &PathBuf) -> io::Result<()> {
+fn write_config_file_contents(config_file: &PathBuf) -> anyhow::Result<()> {
     let contents = r#"# Specify where to sync data from
 source = ""
 
@@ -68,7 +67,7 @@ destination = ""
     Ok(())
 }
 
-fn write_config_file(app_dir: &Path) -> io::Result<()> {
+fn write_config_file(app_dir: &Path) -> anyhow::Result<()> {
     let config_file = program_files::get_config_file(app_dir);
 
     if config_file.exists() {
@@ -81,7 +80,7 @@ fn write_config_file(app_dir: &Path) -> io::Result<()> {
     Ok(())
 }
 
-pub fn initialize_program() -> Result<(), BackupError> {
+pub fn initialize_program() -> anyhow::Result<()> {
     let app_dir = create_app_dir()?;
     write_readme(&app_dir)?;
     write_config_file(&app_dir)?;

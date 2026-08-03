@@ -1,18 +1,14 @@
 use std::env;
-use std::io;
 use std::path::{Path, PathBuf};
 
-fn get_home_dir() -> io::Result<PathBuf> {
+fn get_home_dir() -> anyhow::Result<PathBuf> {
     match env::home_dir() {
         Some(path) => Ok(path),
-        None => Err(io::Error::new(
-            io::ErrorKind::NotFound,
-            "Couldn't get home directory",
-        )),
+        None => anyhow::bail!("Couldn't get home directory"),
     }
 }
 
-pub fn get_app_dir() -> io::Result<PathBuf> {
+pub fn get_app_dir() -> anyhow::Result<PathBuf> {
     let home_dir = get_home_dir()?;
     Ok(home_dir.join(".backup"))
 }

@@ -1,5 +1,4 @@
 use crate::configs::Configs;
-use crate::errors::BackupError;
 
 use super::rsync_dry_run;
 use super::rsync_live_run;
@@ -66,7 +65,7 @@ fn select_log_file(sync_to_hot: bool) -> PathBuf {
     }
 }
 
-pub fn run_data_backup(configs: &Configs) -> Result<(), BackupError> {
+pub fn run_data_backup(configs: &Configs) -> anyhow::Result<()> {
     println!("Select backup type:");
     println!("[1] -> Synchronize directories to HOT storage");
     println!("[2] -> Synchronize directories to HOT storage [DRY RUN]");

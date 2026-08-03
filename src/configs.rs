@@ -1,6 +1,5 @@
 use serde::{Deserialize, Deserializer};
 
-use crate::errors::BackupError;
 use crate::program_files;
 
 use std::fs;
@@ -55,7 +54,7 @@ pub struct Cold {
     pub destination: String,
 }
 
-pub fn load_configs() -> Result<Configs, BackupError> {
+pub fn load_configs() -> anyhow::Result<Configs> {
     let app_dir = program_files::get_app_dir()?;
     let config_file = program_files::get_config_file(&app_dir);
     let toml_str = fs::read_to_string(&config_file)?;

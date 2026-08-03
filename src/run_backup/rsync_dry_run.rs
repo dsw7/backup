@@ -1,5 +1,3 @@
-use crate::errors::BackupError;
-
 use std::process::Command;
 
 pub fn run_rsync_subprocess(
@@ -7,7 +5,7 @@ pub fn run_rsync_subprocess(
     user: &String,
     host: &String,
     dst: &String,
-) -> Result<(), BackupError> {
+) -> anyhow::Result<()> {
     let dst = format!("{user}@{host}:{dst}");
 
     let status = Command::new("rsync")

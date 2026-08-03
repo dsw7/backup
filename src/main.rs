@@ -7,7 +7,6 @@ mod run_init;
 
 use clap::{Parser, Subcommand};
 
-use errors::BackupError;
 use run_backup::run_backup_procedure;
 use run_diff::run_diff_procedure;
 use run_init::initialize_program;
@@ -39,7 +38,7 @@ enum Commands {
     Diff,
 }
 
-fn run_command() -> Result<(), BackupError> {
+fn run_command() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match &cli.command {

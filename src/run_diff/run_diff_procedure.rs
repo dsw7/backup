@@ -1,5 +1,4 @@
 use crate::configs::Configs;
-use crate::errors::BackupError;
 
 use super::subprocesses::{Usage, get_disk_usages};
 
@@ -36,7 +35,7 @@ fn bytes_to_human_readable(usage_bytes: usize) -> String {
     }
 }
 
-fn display_usages(usages: &Vec<Usage>) -> Result<(), BackupError> {
+fn display_usages(usages: &Vec<Usage>) -> anyhow::Result<()> {
     println!(
         "{:<20} {:<25} {:<16} Usage",
         "Host", "Path", "Usage (bytes)"
@@ -71,7 +70,7 @@ fn display_failed_usages(usages: &Vec<Usage>) {
     }
 }
 
-pub fn get_diff_between_machines(configs: &Configs) -> Result<(), BackupError> {
+pub fn get_diff_between_machines(configs: &Configs) -> anyhow::Result<()> {
     let usages = get_disk_usages(configs)?;
 
     display_usages(&usages)?;
