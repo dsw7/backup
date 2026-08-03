@@ -1,5 +1,7 @@
 use std::process::Command;
 
+use anyhow::Context;
+
 pub fn run_rsync_subprocess(
     src: &str,
     user: &String,
@@ -14,10 +16,11 @@ pub fn run_rsync_subprocess(
         .arg("--dry-run")
         .arg(src)
         .arg(dst)
-        .status()?;
+        .status()
+        .context("Failed to run `rsync` subprocess")?;
 
     if !status.success() {
-        eprintln!("Synchronization failed");
+        eprintln!("The dry run procedure failed");
     }
 
     Ok(())
