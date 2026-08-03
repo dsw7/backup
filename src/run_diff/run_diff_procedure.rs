@@ -139,7 +139,11 @@ mod tests {
 
     #[test]
     fn test_unpack_stdout_not_parsable() {
-        assert!(matches!(unpack_stdout("?????   /tmp/bar/"), Err(_)));
+        let res = unpack_stdout("?????   /tmp/bar/");
+        assert!(res.is_err());
+
+        let error = res.unwrap_err();
+        assert_eq!(error.to_string(), "Failed to parse ????? to usize");
     }
 
     #[test]
