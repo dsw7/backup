@@ -4,6 +4,7 @@ use std::process::{ChildStderr, ChildStdout, Command, Stdio};
 use std::thread;
 
 use anyhow::Context;
+use time::macros::format_description;
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::{Registry, fmt};
@@ -13,7 +14,7 @@ use crate::program_files;
 fn worker_log_stdout(stdout: ChildStdout) {
     for line in BufReader::new(stdout).lines() {
         match line {
-            Ok(text) => tracing::info!("(stdout) {text}"),
+            Ok(text) => tracing::info!("{text}"),
             Err(e) => tracing::error!("Error reading line from stdout: {e}"),
         }
     }
@@ -22,7 +23,7 @@ fn worker_log_stdout(stdout: ChildStdout) {
 fn worker_log_stderr(stderr: ChildStderr) {
     for line in BufReader::new(stderr).lines() {
         match line {
-            Ok(text) => tracing::error!("(stderr) {text}"),
+            Ok(text) => tracing::error!("{text}"),
             Err(e) => tracing::error!("Error reading line from stderr: {e}"),
         }
     }
@@ -92,9 +93,14 @@ pub fn run_rsync_subprocess(
     let (non_blocking_file, _guard) = tracing_appender::non_blocking(file_appender);
     // every scope where logging takes place (this + children) must have access to _guard
 
+    let timer = fmt::time::UtcTime::new(format_description!(
+        "[year]-[month]-[day]T[hour]:[minute]:[second]Z"
+    ));
+
     let file_layer = fmt::layer()
         .with_writer(non_blocking_file)
         .with_target(false)
+        .with_timer(timer)
         .with_ansi(false)
         .with_filter(LevelFilter::DEBUG);
 
