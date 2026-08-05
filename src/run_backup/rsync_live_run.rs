@@ -4,6 +4,7 @@ use std::process::{ChildStderr, ChildStdout, Command, Stdio};
 use std::thread;
 
 use anyhow::Context;
+use time::macros::format_description;
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::{Registry, fmt};
@@ -92,9 +93,14 @@ pub fn run_rsync_subprocess(
     let (non_blocking_file, _guard) = tracing_appender::non_blocking(file_appender);
     // every scope where logging takes place (this + children) must have access to _guard
 
+    let timer = fmt::time::UtcTime::new(format_description!(
+        "[year]-[month]-[day]T[hour]:[minute]:[second]Z"
+    ));
+
     let file_layer = fmt::layer()
         .with_writer(non_blocking_file)
         .with_target(false)
+        .with_timer(timer)
         .with_ansi(false)
         .with_filter(LevelFilter::DEBUG);
 
