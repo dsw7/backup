@@ -28,8 +28,8 @@ fn append_slash_to_src(src: &str) -> String {
 }
 
 fn remove_slash_from_dst(dst: &str) -> String {
-    if dst.ends_with('/') {
-        String::from(&dst[..dst.len() - 1])
+    if let Some(stripped) = dst.strip_suffix('/') {
+        String::from(stripped)
     } else {
         String::from(dst)
     }
