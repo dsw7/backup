@@ -29,7 +29,7 @@ fn worker_log_stderr(stderr: ChildStderr) {
     }
 }
 
-fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> anyhow::Result<()> {
+fn run_rsync(src: &str, user: &str, host: &str, dst: &str) -> anyhow::Result<()> {
     tracing::info!("Starting data synchronization");
 
     let dst = format!("{user}@{host}:{dst}");
@@ -77,9 +77,9 @@ fn run_rsync(src: &str, user: &String, host: &String, dst: &String) -> anyhow::R
 
 pub fn run_rsync_subprocess(
     src: &str,
-    user: &String,
-    host: &String,
-    dst: &String,
+    user: &str,
+    host: &str,
+    dst: &str,
     log_file: &Path,
 ) -> anyhow::Result<()> {
     let stdout_layer = fmt::layer()
