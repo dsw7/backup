@@ -2,12 +2,7 @@ use std::process::Command;
 
 use anyhow::Context;
 
-pub fn run_rsync_subprocess(
-    src: &str,
-    user: &String,
-    host: &String,
-    dst: &String,
-) -> anyhow::Result<()> {
+pub fn run_rsync_subprocess(src: &str, user: &str, host: &str, dst: &str) -> anyhow::Result<()> {
     let dst = format!("{user}@{host}:{dst}");
 
     let status = Command::new("rsync")
