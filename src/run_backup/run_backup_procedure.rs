@@ -19,7 +19,7 @@ fn read_option_from_stdin() -> io::Result<i32> {
     Ok(i32::from_str(input.trim()).unwrap_or_default())
 }
 
-fn append_slash_to_src(src: &String) -> String {
+fn append_slash_to_src(src: &str) -> String {
     if src.ends_with('/') {
         String::from(src)
     } else {
@@ -27,7 +27,7 @@ fn append_slash_to_src(src: &String) -> String {
     }
 }
 
-fn remove_slash_from_dst(dst: &String) -> String {
+fn remove_slash_from_dst(dst: &str) -> String {
     if dst.ends_with('/') {
         String::from(&dst[..dst.len() - 1])
     } else {
@@ -106,13 +106,13 @@ mod tests {
 
     #[test]
     fn test_append_slash_to_src() {
-        assert_eq!(append_slash_to_src(&"/tmp/bar".into()), "/tmp/bar/");
-        assert_eq!(append_slash_to_src(&"/tmp/bar/".into()), "/tmp/bar/");
+        assert_eq!(append_slash_to_src("/tmp/bar"), "/tmp/bar/");
+        assert_eq!(append_slash_to_src("/tmp/bar/"), "/tmp/bar/");
     }
 
     #[test]
     fn test_remove_slash_from_dst() {
-        assert_eq!(remove_slash_from_dst(&"/tmp/bar".into()), "/tmp/bar");
-        assert_eq!(remove_slash_from_dst(&"/tmp/bar/".into()), "/tmp/bar");
+        assert_eq!(remove_slash_from_dst("/tmp/bar"), "/tmp/bar");
+        assert_eq!(remove_slash_from_dst("/tmp/bar/"), "/tmp/bar");
     }
 }
