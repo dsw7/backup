@@ -31,7 +31,7 @@ pub enum Usage {
     Failure { host: String, stderr: String },
 }
 
-fn unpack_output(host: &String, output: &Output) -> Usage {
+fn unpack_output(host: &str, output: &Output) -> Usage {
     if output.status.success() {
         Usage::Success {
             host: String::from(host),
@@ -86,7 +86,7 @@ pub fn get_disk_usages(configs: &Configs) -> anyhow::Result<Vec<Usage>> {
         .context("Failed to wait on cold backup")?;
 
     let results = vec![
-        unpack_output(&String::from("localhost"), &output_localhost),
+        unpack_output("localhost", &output_localhost),
         unpack_output(&configs.storage.hot.host, &output_hot_backup),
         unpack_output(&configs.storage.cold.host, &output_cold_backup),
     ];
