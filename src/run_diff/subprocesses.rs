@@ -51,7 +51,7 @@ pub fn get_disk_usages(configs: &Configs) -> anyhow::Result<Vec<Usage>> {
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
-        .context("Something went wrong when spawning `du` command")?;
+        .context("something went wrong when spawning `du` command")?;
 
     let proc_hot_backup = Command::new("ssh")
         .arg(get_ssh_dest_hot(configs))
@@ -62,7 +62,7 @@ pub fn get_disk_usages(configs: &Configs) -> anyhow::Result<Vec<Usage>> {
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
-        .context("Something went wrong when spawning `ssh` command")?;
+        .context("something went wrong when spawning `ssh` command")?;
 
     let proc_cold_backup = Command::new("ssh")
         .arg(get_ssh_dest_cold(configs))
@@ -73,17 +73,17 @@ pub fn get_disk_usages(configs: &Configs) -> anyhow::Result<Vec<Usage>> {
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
-        .context("Something went wrong when spawning `ssh` command")?;
+        .context("something went wrong when spawning `ssh` command")?;
 
     let output_localhost = proc_localhost
         .wait_with_output()
-        .context("Failed to wait on localhost")?;
+        .context("failed to wait on localhost")?;
     let output_hot_backup = proc_hot_backup
         .wait_with_output()
-        .context("Failed to wait on hot backup")?;
+        .context("failed to wait on hot backup")?;
     let output_cold_backup = proc_cold_backup
         .wait_with_output()
-        .context("Failed to wait on cold backup")?;
+        .context("failed to wait on cold backup")?;
 
     let results = vec![
         unpack_output("localhost", &output_localhost),

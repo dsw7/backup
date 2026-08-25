@@ -76,7 +76,7 @@ pub fn run_data_backup(configs: &Configs) -> anyhow::Result<()> {
     println!("[*] -> Exit program");
 
     let option = read_option_from_stdin()
-        .context("Something went wrong when communicating with stdin/stdout")?;
+        .context("something went wrong when communicating with stdin/stdout")?;
 
     if !(1..=4).contains(&option) {
         println!("Backup was manually aborted");

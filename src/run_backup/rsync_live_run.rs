@@ -39,32 +39,32 @@ fn run_rsync(src: &str, user: &str, host: &str, dst: &str) -> anyhow::Result<()>
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
-        .context("Failed to spawn `rsync` subprocess")?;
+        .context("failed to spawn `rsync` subprocess")?;
 
     let stdout = child
         .stdout
         .take()
-        .ok_or_else(|| io::Error::other("Could not capture stdout"))?;
+        .ok_or_else(|| io::Error::other("could not capture stdout"))?;
 
     let stderr = child
         .stderr
         .take()
-        .ok_or_else(|| io::Error::other("Could not capture stderr"))?;
+        .ok_or_else(|| io::Error::other("could not capture stderr"))?;
 
     let handle_stdout = thread::spawn(move || worker_log_stdout(stdout));
     let handle_stderr = thread::spawn(move || worker_log_stderr(stderr));
 
     if handle_stdout.join().is_err() {
-        anyhow::bail!("The stdout thread failed");
+        anyhow::bail!("the stdout thread failed");
     }
 
     if handle_stderr.join().is_err() {
-        anyhow::bail!("The stderr thread failed");
+        anyhow::bail!("the stderr thread failed");
     }
 
     let status = child
         .wait()
-        .context("Failed to wait on `rsync` subprocess")?;
+        .context("failed to wait on `rsync` subprocess")?;
 
     if status.success() {
         tracing::info!("Synchronization succeeded\n");

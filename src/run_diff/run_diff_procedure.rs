@@ -10,7 +10,7 @@ fn unpack_stdout(stdout: &str) -> anyhow::Result<(usize, String)> {
     let bytes = match parts.first() {
         Some(val) => val
             .parse::<usize>()
-            .context(format!("Failed to parse {val} to usize"))?,
+            .context(format!("failed to parse {val} to usize"))?,
         None => 0,
     };
 
@@ -75,9 +75,9 @@ fn display_failed_usages(usages: &Vec<Usage>) {
 }
 
 pub fn get_diff_between_machines(configs: &Configs) -> anyhow::Result<()> {
-    let usages = get_disk_usages(configs).context("Failed to get disk usages")?;
+    let usages = get_disk_usages(configs).context("failed to get disk usages")?;
 
-    display_usages(&usages).context("Failed to display disk usages")?;
+    display_usages(&usages).context("failed to display disk usages")?;
     println!();
     display_failed_usages(&usages);
 
@@ -143,7 +143,7 @@ mod tests {
         assert!(res.is_err());
 
         let error = res.unwrap_err();
-        assert_eq!(error.to_string(), "Failed to parse ????? to usize");
+        assert_eq!(error.to_string(), "failed to parse ????? to usize");
     }
 
     #[test]
