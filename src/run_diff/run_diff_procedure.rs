@@ -1,4 +1,5 @@
 use anyhow::Context;
+use crossterm::style::{Stylize, style};
 
 use crate::configs::Configs;
 
@@ -69,6 +70,7 @@ fn display_failed_usages(usages: &Vec<Usage>) {
 
     for usage in usages {
         if let Usage::Failure { host, stderr } = usage {
+            let stderr = style(&stderr).red();
             println!("{host:<20} {stderr:<25}");
         }
     }
