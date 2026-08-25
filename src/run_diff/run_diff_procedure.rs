@@ -41,10 +41,12 @@ fn bytes_to_human_readable(usage_bytes: usize) -> String {
 }
 
 fn display_usages(usages: &Vec<Usage>) -> anyhow::Result<()> {
-    println!(
+    let header = format!(
         "{:<20} {:<25} {:<16} Usage",
         "Host", "Path", "Usage (bytes)"
     );
+    println!("{}", header.blue());
+
     println!(
         "{:<20} {:<25} {:<16} -------",
         "-------------------", "------------------------", "---------------"
@@ -62,7 +64,9 @@ fn display_usages(usages: &Vec<Usage>) -> anyhow::Result<()> {
 }
 
 fn display_failed_usages(usages: &Vec<Usage>) {
-    println!("{:<20} {:<25}", "Host", "Error");
+    let header = format!("{:<20} {:<25}", "Host", "Error");
+    println!("{}", header.blue());
+
     println!(
         "{:<20} {:<25}",
         "-------------------", "------------------------"
