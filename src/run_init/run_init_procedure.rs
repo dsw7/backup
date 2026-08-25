@@ -20,7 +20,7 @@ fn create_app_dir() -> anyhow::Result<PathBuf> {
     if appdir.exists() {
         log_already_exists(&appdir);
     } else {
-        fs::create_dir(&appdir).context(format!("Failed to create {}", appdir.display()))?;
+        fs::create_dir(&appdir).context(format!("failed to create {}", appdir.display()))?;
         log_new_file(&appdir);
     }
 
@@ -32,11 +32,11 @@ fn write_readme_contents(path_readme: &PathBuf) -> anyhow::Result<()> {
 * For more information, see https://github.com/dsw7/backup";
 
     let mut readme = fs::File::create(path_readme)
-        .context(format!("Could not create {}", path_readme.display()))?;
+        .context(format!("could not create {}", path_readme.display()))?;
 
     readme
         .write_all(contents.as_bytes())
-        .context(format!("Could not write to {}", path_readme.display()))?;
+        .context(format!("could not write to {}", path_readme.display()))?;
 
     Ok(())
 }
@@ -70,13 +70,13 @@ destination = ""
 "#;
 
     let mut configs = fs::File::create(config_file).context(format!(
-        "Could not create the configuration file: {}",
+        "could not create the configuration file: {}",
         config_file.display()
     ))?;
 
     configs
         .write_all(contents.as_bytes())
-        .context(format!("Could not write to {}", config_file.display()))?;
+        .context(format!("could not write to {}", config_file.display()))?;
 
     Ok(())
 }

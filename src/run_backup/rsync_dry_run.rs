@@ -12,7 +12,7 @@ pub fn run_rsync_subprocess(src: &str, user: &str, host: &str, dst: &str) -> any
         .arg(src)
         .arg(dst)
         .status()
-        .context("Failed to run `rsync` subprocess")?;
+        .context("failed to run `rsync` subprocess")?;
 
     if !status.success() {
         eprintln!("The dry run procedure failed");
