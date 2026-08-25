@@ -1,4 +1,5 @@
 use anyhow::Context;
+use crossterm::style::{Stylize, style};
 
 use crate::configs::Configs;
 
@@ -40,10 +41,12 @@ fn bytes_to_human_readable(usage_bytes: usize) -> String {
 }
 
 fn display_usages(usages: &Vec<Usage>) -> anyhow::Result<()> {
-    println!(
+    let header = format!(
         "{:<20} {:<25} {:<16} Usage",
         "Host", "Path", "Usage (bytes)"
     );
+    println!("{}", header.blue());
+
     println!(
         "{:<20} {:<25} {:<16} -------",
         "-------------------", "------------------------", "---------------"
@@ -61,7 +64,9 @@ fn display_usages(usages: &Vec<Usage>) -> anyhow::Result<()> {
 }
 
 fn display_failed_usages(usages: &Vec<Usage>) {
-    println!("{:<20} {:<25}", "Host", "Error");
+    let header = format!("{:<20} {:<25}", "Host", "Error");
+    println!("{}", header.blue());
+
     println!(
         "{:<20} {:<25}",
         "-------------------", "------------------------"
@@ -69,6 +74,7 @@ fn display_failed_usages(usages: &Vec<Usage>) {
 
     for usage in usages {
         if let Usage::Failure { host, stderr } = usage {
+            let stderr = style(&stderr).red();
             println!("{host:<20} {stderr:<25}");
         }
     }
