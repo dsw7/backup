@@ -143,7 +143,7 @@ mod tests {
         assert!(res.is_err());
 
         let error = res.unwrap_err();
-        assert_eq!(error.to_string(), "Failed to parse ????? to usize");
+        assert_eq!(error.to_string(), "failed to parse ????? to usize");
     }
 
     #[test]
