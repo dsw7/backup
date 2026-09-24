@@ -5,11 +5,11 @@ use crate::configs::load_configs;
 mod run_diff_procedure;
 mod subprocesses;
 
+use run_diff_procedure::get_diff_between_machines;
+
 pub fn run_diff_procedure() -> anyhow::Result<()> {
     let configs = load_configs().context("failed to load configurations")?;
-
-    self::run_diff_procedure::get_diff_between_machines(&configs)
-        .context("diff procedure failed")?;
+    get_diff_between_machines(&configs).context("diff procedure failed")?;
 
     Ok(())
 }

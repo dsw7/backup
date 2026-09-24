@@ -6,9 +6,11 @@ mod rsync_dry_run;
 mod rsync_live_run;
 mod run_backup_procedure;
 
+use run_backup_procedure::run_data_backup;
+
 pub fn run_backup_procedure() -> anyhow::Result<()> {
     let configs = load_configs().context("failed to load configurations")?;
-    self::run_backup_procedure::run_data_backup(&configs).context("backup procedure failed")?;
+    run_data_backup(&configs).context("backup procedure failed")?;
 
     Ok(())
 }
